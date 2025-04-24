@@ -13,7 +13,7 @@
             left: 0;
             right: 0;
             width: 100% !important;
-            height: 30vh; /* Ύψος 30% του viewport ύψους */
+            height: 30vh;
             z-index: 9999;
 
             --df-messenger-width: 100%;
@@ -37,29 +37,27 @@
             --df-messenger-button-background: #4285F4;
         }
 
-        /* Responsive για μικρές οθόνες */
         @media (max-width: 768px) {
             df-messenger {
-                height: 40vh; /* 40% ύψος για μικρές οθόνες */
+                height: 40vh;
             }
         }
 
-        /* Αλλαγή θέσης του chat bubble κάτω αριστερά */
+        /* Αλλαγή θέσης του chat bubble και προσθήκη margin */
         df-messenger::part(chat-bubble) {
-            bottom: 16px !important;
-            left: 16px !important;
+            bottom: 20px !important;  /* Λίγο μεγαλύτερο κενό από κάτω */
+            left: 20px !important;   /* Λίγο μεγαλύτερο κενό από αριστερά */
             right: auto !important;
             top: auto !important;
-            /* Προαιρετικά, αν θέλεις να αλλάξεις μέγεθος */
             width: 56px !important;
             height: 56px !important;
             border-radius: 50% !important;
             box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+            margin: 10px !important; /* Προσθήκη margin γύρω από το κουμπί */
         }
 
-        /* Αποφυγή κάλυψης περιεχομένου από το chatbot */
         body {
-            margin-bottom: 30vh; /* Ίσο με το ύψος του chatbot */
+            margin-bottom: 30vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
     </style>
@@ -82,4 +80,5 @@
 
 </body>
 </html>
+
 
