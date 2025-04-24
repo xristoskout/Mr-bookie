@@ -6,9 +6,21 @@
     <title>Ιστοσελίδα με Chatbot</title>
 
     <style>
-        /* Αρχικά, αφήνουμε το df-messenger χωρίς συγκεκριμένη θέση */
-        df-messenger {
-            z-index: 9999 !important;
+        /* Container για το iframe */
+        .chatbot-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30vh;
+            z-index: 9999;
+        }
+
+        /* Στυλ για το iframe */
+        .chatbot-iframe {
+            width: 100%;
+            height: 100%;
+            border: none; /* Αφαίρεση του border */
         }
 
         body {
@@ -16,56 +28,24 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
     </style>
-
-    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js" defer></script>
 </head>
 <body>
 
     <h1>Καλώς ήρθατε στην ιστοσελίδα μας</h1>
     <p>Ο βοηθός μας "Mr Bookie" είναι διαθέσιμος 24/7 για να απαντήσει στις ερωτήσεις σας.</p>
 
-    <df-messenger
-        project-id="bookie-project-450910"
-        agent-id="85683470-0706-49d9-83e1-19ed85087c94"
-        language-code="el"
-        max-query-length="256"
-        allow-feedback="all">
-        <df-messenger-chat-bubble chat-title="Mr Bookie"></df-messenger-chat-bubble>
-    </df-messenger>
-
-    <script>
-        window.addEventListener('load', function() {
-            var dfMessenger = document.querySelector('df-messenger');
-            if (dfMessenger) {
-                // Δημιουργία ενός container για το chatbot
-                var container = document.createElement('div');
-                container.style.position = 'fixed';
-                container.style.bottom = '0';
-                container.style.left = '0';
-                container.style.width = '100%';
-                container.style.height = '30vh';
-                container.style.zIndex = '9999';
-
-                // Προσθήκη του df-messenger στο container
-                container.appendChild(dfMessenger);
-
-                // Προσθήκη του container στο body
-                document.body.appendChild(container);
-
-                // Στυλ για το chat bubble
-                var chatBubble = document.querySelector('df-messenger > df-messenger-chat-bubble');
-                if (chatBubble) {
-                    chatBubble.style.bottom = '20px';
-                    chatBubble.style.left = '20px';
-                    chatBubble.style.right = 'auto';
-                    chatBubble.style.top = 'auto';
-                }
-            }
-        });
-    </script>
+    <!-- Container για το chatbot -->
+    <div class="chatbot-container">
+        <iframe
+            class="chatbot-iframe"
+            src="https://dialogflow.cloud.google.com/v1/integrations/messenger/web/0f64a9a4-b2a9-496f-a7a9-c5efb9c09a45"
+            title="Chatbot">
+        </iframe>
+    </div>
 
 </body>
 </html>
+
 
 
 
