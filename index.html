@@ -31,16 +31,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat με τον Βοηθό</title>
     <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
-    <style>
-    
-        df-messenger {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    --df-messenger-width: 100% !important;
-    --df-messenger-height: 30% !important;
-}
+   <style>
+       
+    df-messenger {
+        z-index: 999;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        /* Adjust dimensions */
+        --df-messenger-width: 100%;
+        --df-messenger-height: 30%; /* Adjust this value for desired height */
 
         /* Border styles */
         --df-messenger-chat-border-radius: 0px;
@@ -70,6 +72,7 @@
         }
     }
 </style>
+    
 </head>
 <body>
     <div class="content">
