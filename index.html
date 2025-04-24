@@ -75,8 +75,34 @@
         allow-feedback="all">
         <df-messenger-chat-bubble chat-title="Mr Bookie"></df-messenger-chat-bubble>
     </df-messenger>
-
 </body>
+        <script>
+        window.addEventListener('load', function() {
+            var dfMessenger = document.querySelector('df-messenger');
+            if (dfMessenger) {
+                dfMessenger.style.position = 'fixed';
+                dfMessenger.style.bottom = '0';
+                dfMessenger.style.left = '0';
+                dfMessenger.style.right = '0';
+                dfMessenger.style.width = '100%';
+                dfMessenger.style.height = '30vh';
+                dfMessenger.style.zIndex = '9999';
+            }
+
+            var chatBubble = document.querySelector('df-messenger::part(chat-bubble)');
+            if (chatBubble) {
+                chatBubble.style.bottom = '20px';
+                chatBubble.style.left = '20px';
+                chatBubble.style.right = 'auto';
+                chatBubble.style.top = 'auto';
+                chatBubble.style.width = '56px';
+                chatBubble.style.height = '56px';
+                chatBubble.style.borderRadius = '50%';
+                chatBubble.style.boxShadow = '0 3px 6px rgba(0,0,0,0.3)';
+                chatBubble.style.margin = '10px';
+            }
+        });
+    </script>    
 </html>
 
 
