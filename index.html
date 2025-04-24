@@ -6,52 +6,9 @@
     <title>Ιστοσελίδα με Chatbot</title>
 
     <style>
-        /* Θέση του κουμπιού (chat bubble) κάτω αριστερά */
-        df-messenger::part(chat-bubble) {
-            bottom: 20px !important;
-            left: 20px !important;
-            right: auto !important;
-            top: auto !important;
-            width: 56px !important;
-            height: 56px !important;
-            border-radius: 50% !important;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-            margin: 10px !important;
-        }
-
-        /* Θέση και στυλ του παραθύρου του chatbot */
+        /* Αρχικά, αφήνουμε το df-messenger χωρίς συγκεκριμένη θέση */
         df-messenger {
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            width: 100% !important;
-            height: 30vh !important;
             z-index: 9999 !important;
-            margin: 0 !important;
-
-            --df-messenger-width: 100%;
-            --df-messenger-height: 100%;
-            --df-messenger-chat-border-radius: 0;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            --df-messenger-chat-background: #ffffff;
-            --df-messenger-header-background: #4285F4;
-            --df-messenger-header-font-color: white;
-            --df-messenger-message-user-background: #d3e3fd;
-            --df-messenger-message-bot-background: #FCE8B2;
-            --df-messenger-button-border-radius: 50%;
-            --df-messenger-chat-padding: 16px;
-            --df-messenger-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --df-messenger-input-box-border-radius: 18px;
-            --df-messenger-input-box-background: #f6f6f6;
-            --df-messenger-message-border-radius: 18px;
-            --df-messenger-button-background: #4285F4;
-        }
-
-        @media (max-width: 768px) {
-            df-messenger {
-                height: 40vh !important;
-            }
         }
 
         body {
@@ -75,34 +32,39 @@
         allow-feedback="all">
         <df-messenger-chat-bubble chat-title="Mr Bookie"></df-messenger-chat-bubble>
     </df-messenger>
-</body>
-        <script>
+
+    <script>
         window.addEventListener('load', function() {
             var dfMessenger = document.querySelector('df-messenger');
             if (dfMessenger) {
-                dfMessenger.style.position = 'fixed';
-                dfMessenger.style.bottom = '0';
-                dfMessenger.style.left = '0';
-                dfMessenger.style.right = '0';
-                dfMessenger.style.width = '100%';
-                dfMessenger.style.height = '30vh';
-                dfMessenger.style.zIndex = '9999';
-            }
+                // Δημιουργία ενός container για το chatbot
+                var container = document.createElement('div');
+                container.style.position = 'fixed';
+                container.style.bottom = '0';
+                container.style.left = '0';
+                container.style.width = '100%';
+                container.style.height = '30vh';
+                container.style.zIndex = '9999';
 
-            var chatBubble = document.querySelector('df-messenger::part(chat-bubble)');
-            if (chatBubble) {
-                chatBubble.style.bottom = '20px';
-                chatBubble.style.left = '20px';
-                chatBubble.style.right = 'auto';
-                chatBubble.style.top = 'auto';
-                chatBubble.style.width = '56px';
-                chatBubble.style.height = '56px';
-                chatBubble.style.borderRadius = '50%';
-                chatBubble.style.boxShadow = '0 3px 6px rgba(0,0,0,0.3)';
-                chatBubble.style.margin = '10px';
+                // Προσθήκη του df-messenger στο container
+                container.appendChild(dfMessenger);
+
+                // Προσθήκη του container στο body
+                document.body.appendChild(container);
+
+                // Στυλ για το chat bubble
+                var chatBubble = document.querySelector('df-messenger > df-messenger-chat-bubble');
+                if (chatBubble) {
+                    chatBubble.style.bottom = '20px';
+                    chatBubble.style.left = '20px';
+                    chatBubble.style.right = 'auto';
+                    chatBubble.style.top = 'auto';
+                }
             }
         });
-    </script>    
+    </script>
+
+</body>
 </html>
 
 
