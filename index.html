@@ -32,49 +32,45 @@
     <title>Chat με τον Βοηθό</title>
     <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
     <style>
+    df-messenger {
+        z-index: 999;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        /* Adjust dimensions */
+        --df-messenger-width: 100%;
+        --df-messenger-height: 30%; /* Adjust this value for desired height */
+
+        /* Border styles */
+        --df-messenger-chat-border-radius: 0px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+        /* Color theme */
+        --df-messenger-chat-background: #ffffff;
+        --df-messenger-header-background: #4285F4;
+        --df-messenger-header-font-color: white;
+        --df-messenger-message-user-background: #d3e3fd;
+        --df-messenger-message-bot-background: #FCE8B2;
+
+        /* Additional style variables */
+        --df-messenger-button-border-radius: 50%;
+        --df-messenger-chat-padding: 16px;
+        --df-messenger-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        --df-messenger-input-box-border-radius: 18px;
+        --df-messenger-input-box-background: #f6f6f6;
+        --df-messenger-message-border-radius: 18px;
+        --df-messenger-button-background: #4285F4;
+    }
+
+    /* Ensure proper behavior in different viewports */
+    @media (max-width: 768px) {
         df-messenger {
-            z-index: 999;
-            position: fixed;
-            bottom: 16px;
-            right: 16px;
-            
-            /* Border styles */
-            --df-messenger-chat-border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            
-            /* Color theme */
-            --df-messenger-chat-background: #ffffff;
-            --df-messenger-header-background: #4285F4;
-            --df-messenger-header-font-color: white;
-            --df-messenger-message-user-background: #d3e3fd;
-            --df-messenger-message-bot-background: #FCE8B2;
-
-            /* Additional style variables */
-            --df-messenger-button-border-radius: 50%;
-            --df-messenger-chat-padding: 16px;
-            --df-messenger-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --df-messenger-input-box-border-radius: 18px;
-            --df-messenger-input-box-background: #f6f6f6;
-            --df-messenger-message-border-radius: 18px;
-            --df-messenger-button-background: #4285F4;
+            --df-messenger-height: 40%; /* Adjust height for smaller screens */
         }
-
-        /* Ensure proper behavior in different viewports */
-        @media (max-width: 768px) {
-            df-messenger {
-                bottom: 12px;
-                right: 12px;
-            }
-        }
-
-        /* Optional: Add some content to the page */
-        .content {
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
     <div class="content">
