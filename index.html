@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ιστοσελίδα με Chatbot</title>
+    <style>
+        #chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Καλώς ήρθατε!</h1>
+    
+    <!-- Αντικαταστήστε αυτό το σχόλιο με το chatbot script σας -->
+    <div id="chatbot-container">
+        <!-- Θα εμφανιστεί εδώ το chatbot -->
+    </div>
+
+    <!-- Βάλτε το script σας ΚΑΤΩ από αυτή τη γραμμή -->
+
+  <!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat με τον Βοηθό</title>
+    <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
+    <style>
+        df-messenger {
+            z-index: 999;
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            
+            /* Border styles */
+            --df-messenger-chat-border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            
+            /* Color theme */
+            --df-messenger-chat-background: #ffffff;
+            --df-messenger-header-background: #4285F4;
+            --df-messenger-header-font-color: white;
+            --df-messenger-message-user-background: #d3e3fd;
+            --df-messenger-message-bot-background: #FCE8B2;
+
+            /* Additional style variables */
+            --df-messenger-button-border-radius: 50%;
+            --df-messenger-chat-padding: 16px;
+            --df-messenger-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --df-messenger-input-box-border-radius: 18px;
+            --df-messenger-input-box-background: #f6f6f6;
+            --df-messenger-message-border-radius: 18px;
+            --df-messenger-button-background: #4285F4;
+        }
+
+        /* Ensure proper behavior in different viewports */
+        @media (max-width: 768px) {
+            df-messenger {
+                bottom: 12px;
+                right: 12px;
+            }
+        }
+
+        /* Optional: Add some content to the page */
+        .content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Καλώς ήρθατε στην ιστοσελίδα μας</h1>
+        <p>Ο βοηθός μας "Mr Bookie" είναι διαθέσιμος 24/7 για να απαντήσει στις ερωτήσεις σας.</p>
+    </div>
+
+    <!-- Dialogflow Messenger Chat Widget -->
+    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+    <df-messenger
+        project-id="bookie-project-450910"
+        agent-id="85683470-0706-49d9-83e1-19ed85087c94"
+        language-code="el"
+        max-query-length="256"
+        allow-feedback="all">
+        <df-messenger-chat-bubble chat-title="Mr Bookie"></df-messenger-chat-bubble>
+    </df-messenger>
+</body>
+</html>
+  
+</body>
+</html>
