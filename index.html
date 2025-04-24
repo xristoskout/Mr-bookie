@@ -6,6 +6,16 @@
     <title>Ιστοσελίδα με Chatbot</title>
     <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
     <style>
+        /* Στυλ για το φόντο */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-bottom: 70px; /* Δημιουργία χώρου για το chatbot */
+            background-image: url('https://pplx-res.cloudinary.com/image/private/user_uploads/DeZgnnyEaMfHzua/perplex.jpg'); /* Εισαγωγή της φωτογραφίας */
+            background-size: cover; /* Κάλυψη ολόκληρης της οθόνης */
+            background-repeat: no-repeat; /* Αποφυγή επανάληψης της φωτογραφίας */
+            background-attachment: fixed; /* Σταθερό φόντο κατά το scroll */
+        }
+
         /* Βασικά στυλ για το chatbot */
         df-messenger {
             z-index: 999;
@@ -35,7 +45,7 @@
         }
 
         /* Ρυθμίσεις για μικρότερες οθόνες */
-        @media (max-width: 999px) {
+        @media (max-width: 768px) {
             df-messenger {
                 bottom: 12px;
                 right: 12px;
@@ -43,11 +53,6 @@
         }
 
         /* Προαιρετικά: Στυλ για το υπόλοιπο περιεχόμενο της σελίδας */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin-bottom: 70px; /* Δημιουργία χώρου για το chatbot */
-        }
-
         .content {
             padding: 20px;
             max-width: 800px;
@@ -59,14 +64,14 @@
     
     
     <div class="content">
-        <h1>Καλώς ήρθατε στην ιστοσελίδα μας</h1>
+        <h1>Welcome to Mr Bookie</h1>
         <p>Ο βοηθός μας "Mr Bookie" είναι διαθέσιμος 24/7 για να απαντήσει στις ερωτήσεις σας.</p>
     </div>
 
     
     <df-messenger
         project-id="bookie-project-450910"
-        agent-id="85683470-0706-49d9-83e1-19ed85087c94"
+        agent-id="85683470-0706-496f-a7a9-c5efb9c09a45"
         language-code="el"
         max-query-length="256"
         allow-feedback="all">
@@ -77,6 +82,7 @@
     <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
 </body>
 </html>
+
 
 
 
