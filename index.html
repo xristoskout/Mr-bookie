@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ιστοσελίδα με Chatbot</title>
 
-    <!-- Στυλ για το chatbot -->
     <style>
         /* Στυλ για το df-messenger ώστε να είναι στο κάτω μέρος και να πιάσει όλο το πλάτος */
         df-messenger {
@@ -17,7 +16,6 @@
             height: 30vh; /* Ύψος 30% του viewport ύψους */
             z-index: 9999;
 
-            /* Προσαρμογή εμφάνισης */
             --df-messenger-width: 100%;
             --df-messenger-height: 100%;
 
@@ -46,14 +44,26 @@
             }
         }
 
-        /* Προαιρετικά, λίγο padding στο σώμα για να μην καλύπτεται περιεχόμενο */
+        /* Αλλαγή θέσης του chat bubble κάτω αριστερά */
+        df-messenger::part(chat-bubble) {
+            bottom: 16px !important;
+            left: 16px !important;
+            right: auto !important;
+            top: auto !important;
+            /* Προαιρετικά, αν θέλεις να αλλάξεις μέγεθος */
+            width: 56px !important;
+            height: 56px !important;
+            border-radius: 50% !important;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+
+        /* Αποφυγή κάλυψης περιεχομένου από το chatbot */
         body {
-            margin-bottom: 30vh; /* Ίσο με το ύψος του chatbot για να μην καλύπτεται περιεχόμενο */
+            margin-bottom: 30vh; /* Ίσο με το ύψος του chatbot */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
     </style>
 
-    <!-- Φόρτωση του Dialogflow Messenger script -->
     <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js" defer></script>
 </head>
 <body>
@@ -61,7 +71,6 @@
     <h1>Καλώς ήρθατε στην ιστοσελίδα μας</h1>
     <p>Ο βοηθός μας "Mr Bookie" είναι διαθέσιμος 24/7 για να απαντήσει στις ερωτήσεις σας.</p>
 
-    <!-- Το chatbot -->
     <df-messenger
         project-id="bookie-project-450910"
         agent-id="85683470-0706-49d9-83e1-19ed85087c94"
@@ -73,3 +82,4 @@
 
 </body>
 </html>
+
