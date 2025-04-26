@@ -3,99 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot</title>
+    <title>Ιστοσελίδα με Chatbot</title>
+    <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
     <style>
-        /* CSS για το chat UI */
-        .chat-container {
-            width: 400px;
-            margin: 20px auto;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            overflow: hidden;
+        /* Στυλ για το φόντο */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-bottom: 70px; /* Δημιουργία χώρου για το chatbot */
+            background-image: url('https://pplx-res.cloudinary.com/image/private/user_uploads/DeZgnnyEaMfHzua/perplex.jpg'); /* Εισαγωγή της φωτογραφίας */
+            background-size: cover; /* Κάλυψη ολόκληρης της οθόνης */
+            background-repeat: no-repeat; /* Αποφυγή επανάληψης της φωτογραφίας */
+            background-attachment: fixed; /* Σταθερό φόντο κατά το scroll */
         }
 
-        #chatLog {
-            padding: 10px;
-            height: 300px;
-            overflow-y: scroll;
+        /* Βασικά στυλ για το chatbot */
+        df-messenger {
+            z-index: 999;
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            
+            /* Στυλ για το πλαίσιο */
+            --df-messenger-chat-border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            
+            /* Χρωματική παλέτα */
+            --df-messenger-chat-background: #ffffff;
+            --df-messenger-header-background: #4285F4;
+            --df-messenger-header-font-color: white;
+            --df-messenger-message-user-background: #d3e3fd;
+            --df-messenger-message-bot-background: #FCE8B2;
+
+            /* Επιπλέον στυλ */
+            --df-messenger-button-border-radius: 50%;
+            --df-messenger-chat-padding: 16px;
+            --df-messenger-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --df-messenger-input-box-border-radius: 18px;
+            --df-messenger-input-box-background: #f6f6f6;
+            --df-messenger-message-border-radius: 18px;
+            --df-messenger-button-background: #4285F4;
         }
 
-        .chat-input {
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid #ccc;
+        /* Ρυθμίσεις για μικρότερες οθόνες */
+        @media (max-width: 768px) {
+            df-messenger {
+                bottom: 12px;
+                right: 12px;
+            }
         }
 
-        .chat-input input {
-            flex: 1;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
-
-        .chat-input button {
-            padding: 5px 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
+        /* Προαιρετικά: Στυλ για το υπόλοιπο περιεχόμενο της σελίδας */
+        .content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
         }
     </style>
 </head>
 <body>
-    <h1>Chat with the Bot</h1>
-
-    <div class="chat-container">
-        <div id="chatLog"></div>
-        <div class="chat-input">
-            <input type="text" id="messageInput" placeholder="Γράψε το μήνυμά σου...">
-            <button onclick="sendMessageToBot()">Send</button>
-        </div>
+    
+    
+    <div class="content">
+        <h1>Welcome to Mr Bookie</h1>
+        <p>Ο βοηθός μας "Mr Bookie" είναι διαθέσιμος 24/7 για να απαντήσει στις ερωτήσεις σας.</p>
     </div>
 
-    <script>
-        let sessionId = null; // Initialize sessionId
-        const chatLog = document.getElementById('chatLog');
-        const messageInput = document.getElementById('messageInput');
+    
+    <df-messenger
+        project-id="bookie-project-450910"
+        agent-id="85683470-0706-496f-a7a9-c5efb9c09a45"
+        language-code="el"
+        max-query-length="256"
+        allow-feedback="all">
+        <df-messenger-chat-bubble chat-title="Mr Bookie"></df-messenger-chat-bubble>
+    </df-messenger>
 
-        async function sendMessageToBot() {
-            const message = messageInput.value;
-            messageInput.value = ''; // Clear the input field
-
-            // Display user message
-            displayMessage(message, 'user');
-
-            const requestBody = { message: message };
-
-            if (sessionId) {
-                requestBody.session_id = sessionId;  // Add sessionId to the request if it exists
-            }
-
-            const response = await fetch("http://127.0.0.1:8000/chat", {  // Replace with the correct URL
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            const data = await response.json();
-            const botReply = data.queryResult.fulfillmentText; // Adjust this based on the actual response structure
-            sessionId = data.session_id;  // Store the session ID returned by the backend
-
-            // Display bot message
-            displayMessage(botReply, 'bot');
-        }
-
-        function displayMessage(message, sender) {
-            const messageElement = document.createElement('div');
-            messageElement.textContent = `${sender}: ${message}`;
-            chatLog.appendChild(messageElement);
-
-            // Scroll to bottom of chat log
-            chatLog.scrollTop = chatLog.scrollHeight;
-        }
-    </script>
+    
+    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
 </body>
 </html>
