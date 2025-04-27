@@ -1,4 +1,4 @@
-# save as app.py
+# save as main.py
 
 from fastapi import FastAPI, Request
 import google.auth
