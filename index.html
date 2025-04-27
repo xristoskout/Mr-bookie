@@ -76,7 +76,7 @@ async function sendMessage() {
   displayMessage(text, 'user');
   input.value = "";
 
-  const response = await fetch("https://xristoskout.github.io/Mr-bookie/chat", {
+  const response = await fetch("https://mr-bookie-api.onrender.com/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
