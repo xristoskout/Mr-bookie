@@ -1,20 +1,43 @@
 # main.py
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 import requests
-import google.auth
+from google.cloud import secretmanager
+from google.oauth2 import service_account
 from google.auth.transport.requests import Request as GoogleRequest
+import json
 
 app = FastAPI()
 
-# Πληροφορίες Project και Agent
+# Allow CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# Google Cloud settings
 PROJECT_ID = "bookie-project-450910"
 AGENT_ID = "85683470-0706-496f-a7a9-c5efb9c09a45"
 LANGUAGE_CODE = "el"
+SECRET_ID = "bookie-service-account"
 
-# Παίρνουμε το access token απευθείας από το περιβάλλον του Cloud Run
 def get_access_token():
-    credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+    client = secretmanager.SecretManagerServiceClient()
+    secret_name = f"projects/{PROJECT_ID}/secrets/{SECRET_ID}/versions/latest"
+    response = client.access_secret_version(request={"name": secret_name})
+    secret_payload = response.payload.data.decode("UTF-8")
+    
+    service_account_info = json.loads(secret_payload)
+
+    credentials = service_account.Credentials.from_service_account_info(
+        service_account_info,
+        scopes=["https://www.googleapis.com/auth/cloud-platform"]
+    )
     credentials.refresh(GoogleRequest())
     return credentials.token
 
@@ -27,8 +50,9 @@ async def chat_with_bot(request: Request):
     access_token = get_access_token()
 
     endpoint = (
-        f"https://us-central1-dialogflow.googleapis.com/v3/projects/"
-        f"{PROJECT_ID}/locations/global/agents/{AGENT_ID}/sessions/{session_id}:detectIntent"
+    f"https://dialogflow.googleapis.com/v3/projects/"
+    f"bookie-project-450910/locations/global/agents/85683470-0706-496f-a7a9-c5efb9c09a45/sessions/{session_id}:detectIntent"
+
     )
 
     headers = {
@@ -58,4 +82,9 @@ async def chat_with_bot(request: Request):
 @app.get("/")
 def home():
     return {"message": "Mr Bookie API is running! 🚀"}
+
+# === Προσθήκη σωστής εκκίνησης για Cloud Run ===
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8080)
 
