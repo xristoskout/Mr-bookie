@@ -29,6 +29,12 @@
       flex-direction: column;
       overflow: hidden;
       z-index: 999;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     #messages {
@@ -39,22 +45,35 @@
 
     .message {
       margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 20px;
+      display: inline-block;
+      max-width: 80%;
+      animation: popIn 0.3s ease;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
 
     .user {
+      background-color: #e0f2ff;
+      align-self: flex-end;
       text-align: right;
-      color: #4285F4;
     }
 
     .bot {
+      background-color: #e6ffe6;
+      align-self: flex-start;
       text-align: left;
-      color: #34A853;
     }
 
     #input-area {
       display: flex;
       padding: 10px;
       border-top: 1px solid #ccc;
+      background: #fafafa;
     }
 
     #user-input {
@@ -74,12 +93,27 @@
       height: 40px;
       margin-left: 10px;
       cursor: pointer;
+      font-size: 18px;
     }
 
     #typing {
       font-style: italic;
       color: gray;
       margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    #typing span {
+      margin-left: 5px;
+      animation: dots 1.5s steps(5, end) infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: ""; }
+      40% { content: "."; }
+      60% { content: ".."; }
+      80%, 100% { content: "..."; }
     }
 
     #restart-btn {
@@ -88,9 +122,10 @@
       border: none;
       border-radius: 20px;
       padding: 5px 15px;
-      margin-top: 5px;
+      margin: 10px auto;
       cursor: pointer;
       font-size: 14px;
+      display: block;
     }
 
   </style>
@@ -110,7 +145,7 @@
 <audio id="notif-sound" src="https://notificationsounds.com/storage/sounds/file-sounds-1153-pristine.mp3" preload="auto"></audio>
 
 <script>
-const apiUrl = "https://bookie-fastapi-229617631808.europe-west1.run.app/chat"; // <-- ΒΑΛΕ ΤΟ URL ΤΟΥ FASTAPI ΣΟΥ εδώ!
+const apiUrl = "https://bookie-fastapi-229617631808.europe-west1.run.app/chat"; // <-- το URL του FastAPI backend
 
 const messagesDiv = document.getElementById('messages');
 const userInput = document.getElementById('user-input');
@@ -119,12 +154,10 @@ const notifSound = document.getElementById('notif-sound');
 
 let sessionId = generateSessionId();
 
-// Δημιουργία τυχαίου session ID
 function generateSessionId() {
   return Math.random().toString(36).substr(2, 9);
 }
 
-// Προσθήκη μηνύματος στο chat
 function addMessage(text, sender) {
   const msg = document.createElement('div');
   msg.classList.add('message', sender);
@@ -133,24 +166,19 @@ function addMessage(text, sender) {
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// Δείξε το "Mr Bookie γράφει..."
 function showTyping() {
   const typing = document.createElement('div');
   typing.id = 'typing';
-  typing.innerText = 'Ο Mr Bookie γράφει... ✍️';
+  typing.innerHTML = 'Ο Mr Bookie γράφει<span>...</span>';
   messagesDiv.appendChild(typing);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// Κρύψε το "γράφει..."
 function hideTyping() {
   const typing = document.getElementById('typing');
-  if (typing) {
-    typing.remove();
-  }
+  if (typing) typing.remove();
 }
 
-// Στείλε μήνυμα στον server
 async function sendMessage() {
   const text = userInput.value.trim();
   if (!text) return;
@@ -162,9 +190,7 @@ async function sendMessage() {
   try {
     const response = await fetch(apiUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: text,
         session_id: sessionId
@@ -174,9 +200,9 @@ async function sendMessage() {
     const data = await response.json();
     hideTyping();
 
-    const reply = data.queryResult.fulfillmentText || "Δεν κατάλαβα, μπορείς να επαναλάβεις;";
+    const reply = data.queryResult?.fulfillmentText || "Δεν κατάλαβα, μπορείς να επαναλάβεις;";
     addMessage(reply, 'bot');
-    notifSound.play(); // Παίξε ήχο απάντησης
+    notifSound.play();
 
   } catch (error) {
     hideTyping();
@@ -189,7 +215,6 @@ userInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') sendMessage();
 });
 
-// Κουμπί "Ξεκίνα από την αρχή"
 const restartBtn = document.createElement('button');
 restartBtn.id = 'restart-btn';
 restartBtn.innerText = 'Ξεκίνα από την αρχή';
@@ -203,4 +228,3 @@ document.getElementById('chatbox').appendChild(restartBtn);
 
 </body>
 </html>
-
