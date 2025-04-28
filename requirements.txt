@@ -1,6 +1,6 @@
 fastapi
-uvicorn
-requests
+uvicorn[standard]
 google-auth
 google-auth-oauthlib
 google-auth-httplib2
+requests
