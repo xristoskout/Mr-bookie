@@ -127,7 +127,6 @@
       font-size: 14px;
       display: block;
     }
-
   </style>
 </head>
 
@@ -145,7 +144,7 @@
 <audio id="notif-sound" src="https://notificationsounds.com/storage/sounds/file-sounds-1153-pristine.mp3" preload="auto"></audio>
 
 <script>
-const apiUrl = "https://bookie-fastapi-229617631808.europe-west1.run.app/chat"; // <-- το URL του FastAPI backend
+const apiUrl = "https://bookie-fastapi-229617631808.europe-west1.run.app/chat"; // <-- Βάλε εδώ το σωστό URL του Cloud Run!
 
 const messagesDiv = document.getElementById('messages');
 const userInput = document.getElementById('user-input');
@@ -197,6 +196,10 @@ async function sendMessage() {
       }),
     });
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const data = await response.json();
     hideTyping();
 
@@ -205,6 +208,7 @@ async function sendMessage() {
     notifSound.play();
 
   } catch (error) {
+    console.error('Error sending message:', error);
     hideTyping();
     addMessage("Σφάλμα σύνδεσης 😞", 'bot');
   }
@@ -228,3 +232,4 @@ document.getElementById('chatbox').appendChild(restartBtn);
 
 </body>
 </html>
+
