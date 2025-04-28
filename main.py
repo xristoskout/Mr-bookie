@@ -1,26 +1,20 @@
-# save as main.py
+# main.py
 
 from fastapi import FastAPI, Request
+import requests
 import google.auth
 from google.auth.transport.requests import Request as GoogleRequest
-from google.oauth2 import service_account
-import requests
-import os
 
 app = FastAPI()
 
-# Φόρτωσε το service account JSON αρχείο
-SERVICE_ACCOUNT_FILE = "bookie-project-450910-8543366a5c3f.json"  # Εδώ δίνεις το δικό σου .json
+# Πληροφορίες Project και Agent
 PROJECT_ID = "bookie-project-450910"
 AGENT_ID = "85683470-0706-496f-a7a9-c5efb9c09a45"
 LANGUAGE_CODE = "el"
 
-# Κάνουμε authentication για να πάρουμε access token
+# Παίρνουμε το access token απευθείας από το περιβάλλον του Cloud Run
 def get_access_token():
-    credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE,
-        scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    )
+    credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
     credentials.refresh(GoogleRequest())
     return credentials.token
 
@@ -28,10 +22,14 @@ def get_access_token():
 async def chat_with_bot(request: Request):
     body = await request.json()
     user_text = body.get("message")
+    session_id = body.get("session_id", "123456789")
 
     access_token = get_access_token()
 
-    endpoint = f"https://us-central1-dialogflow.googleapis.com/v3/projects/bookie-project-450910/locations/global/agents/85683470-0706-496f-a7a9-c5efb9c09a45/sessions/123456789:detectIntent"
+    endpoint = (
+        f"https://us-central1-dialogflow.googleapis.com/v3/projects/"
+        f"{PROJECT_ID}/locations/global/agents/{AGENT_ID}/sessions/{session_id}:detectIntent"
+    )
 
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -49,4 +47,15 @@ async def chat_with_bot(request: Request):
 
     response = requests.post(endpoint, headers=headers, json=payload)
 
-    return response.json()
+    if response.status_code != 200:
+        return {"queryResult": {"fulfillmentText": "⚠️ Παρουσιάστηκε πρόβλημα στην επικοινωνία με τον agent."}}
+
+    dialogflow_response = response.json()
+    reply_text = dialogflow_response.get("queryResult", {}).get("fulfillmentText", "Δεν κατάλαβα, μπορείς να επαναλάβεις;")
+
+    return {"queryResult": {"fulfillmentText": reply_text}}
+
+@app.get("/")
+def home():
+    return {"message": "Mr Bookie API is running! 🚀"}
+
