@@ -1,59 +1,53 @@
-# main.py
-
 from fastapi import FastAPI, Request
+# ADD THIS IMPORT
 from fastapi.middleware.cors import CORSMiddleware
+import os
+import json
 import requests
 from google.cloud import secretmanager
-from google.oauth2 import service_account
 from google.auth.transport.requests import Request as GoogleRequest
-import json
+from google.oauth2 import service_account
 
 app = FastAPI()
 
-# Allow CORS
+# --- ADD CORS MIDDLEWARE CONFIGURATION ---
+origins = [
+    "https://xristoskout.github.io", # Allow your specific frontend origin
+    # You might also want to allow localhost for local development
+    "http://localhost",
+    "http://localhost:8080", # Or whatever port you use locally
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=origins, # List of origins allowed
+    allow_credentials=True, # Allow cookies (if needed)
+    allow_methods=["*"],    # Allow all methods (GET, POST, OPTIONS, etc.) or specify ["POST", "OPTIONS"]
+    allow_headers=["*"],    # Allow all headers or specify ["Content-Type", etc.]
 )
+# --- END CORS MIDDLEWARE CONFIGURATION ---
 
 
-# Google Cloud settings
 PROJECT_ID = "bookie-project-450910"
-AGENT_ID = "85683470-0706-496f-a7a9-c5efb9c09a45"
+AGENT_ID = "85683470-0706-49d9-83e1-19ed85087c94"
 LANGUAGE_CODE = "el"
-SECRET_ID = "bookie-service-account"
 
-def get_access_token():
-    client = secretmanager.SecretManagerServiceClient()
-    secret_name = f"projects/{PROJECT_ID}/secrets/{SECRET_ID}/versions/latest"
-    response = client.access_secret_version(request={"name": secret_name})
-    secret_payload = response.payload.data.decode("UTF-8")
-    
-    service_account_info = json.loads(secret_payload)
-
-    credentials = service_account.Credentials.from_service_account_info(
-        service_account_info,
-        scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    )
-    credentials.refresh(GoogleRequest())
-    return credentials.token
+# ... (rest of your get_credentials, get_access_token, chat_with_bot functions remain the same) ...
 
 @app.post("/chat")
 async def chat_with_bot(request: Request):
+    # ... (your existing function code) ...
     body = await request.json()
     user_text = body.get("message")
-    session_id = body.get("session_id", "123456789")
+    session_id = body.get("session_id", "default-session")
 
-    access_token = get_access_token()
+    try:
+        access_token = get_access_token()
+    except Exception as e:
+        print(f"Failed to get access token: {e}")
+        return {"queryResult": {"fulfillmentText": "Σφάλμα: δεν μπόρεσα να πάρω access token."}}
 
-    endpoint = (
-    f"https://dialogflow.googleapis.com/v3/projects/"
-    f"bookie-project-450910/locations/global/agents/85683470-0706-496f-a7a9-c5efb9c09a45/sessions/{session_id}:detectIntent"
-
-    )
+    endpoint = f"https://dialogflow.googleapis.com/v3/projects/{PROJECT_ID}/locations/global/agents/{AGENT_ID}/sessions/{session_id}:detectIntent"
 
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -63,28 +57,17 @@ async def chat_with_bot(request: Request):
     payload = {
         "queryInput": {
             "text": {
-                "text": user_text,
-                "languageCode": LANGUAGE_CODE
-            }
+                "text": user_text
+            },
+            "languageCode": LANGUAGE_CODE
         }
     }
 
     response = requests.post(endpoint, headers=headers, json=payload)
 
     if response.status_code != 200:
-        return {"queryResult": {"fulfillmentText": "⚠️ Παρουσιάστηκε πρόβλημα στην επικοινωνία με τον agent."}}
+        print(f"Dialogflow error: {response.text}")
+        return {"queryResult": {"fulfillmentText": "Σφάλμα επικοινωνίας με τον Mr. Bookie."}}
 
-    dialogflow_response = response.json()
-    reply_text = dialogflow_response.get("queryResult", {}).get("fulfillmentText", "Δεν κατάλαβα, μπορείς να επαναλάβεις;")
-
-    return {"queryResult": {"fulfillmentText": reply_text}}
-
-@app.get("/")
-def home():
-    return {"message": "Mr Bookie API is running! 🚀"}
-
-# === Προσθήκη σωστής εκκίνησης για Cloud Run ===
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8080)
+    return response.json()
 
