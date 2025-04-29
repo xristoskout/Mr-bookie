@@ -160,6 +160,8 @@ function generateSessionId() {
 function addMessage(text, sender) {
   const msg = document.createElement('div');
   msg.classList.add('message', sender);
+  // Χρησιμοποίησε innerHTML για να επιτρέψεις απλές HTML tags αν χρειαστεί (προαιρετικά)
+  // Για ασφάλεια, αν δεν περιμένεις HTML, το innerText είναι καλύτερο.
   msg.innerText = text;
   messagesDiv.appendChild(msg);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -196,14 +198,35 @@ async function sendMessage() {
       }),
     });
 
+    // Console log για να δεις την ακατέργαστη απάντηση (χρήσιμο για debug)
+    console.log("Raw Response Status:", response.status);
+
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+       // Προσπάθησε να διαβάσεις το σώμα της απάντησης ακόμα και αν είναι σφάλμα
+       let errorBody = "Could not read error body";
+       try {
+           errorBody = await response.text(); // Διάβασε ως κείμενο για να δεις τι είναι
+           console.error("Error Response Body:", errorBody);
+       } catch(e) {
+           console.error("Could not read error body:", e);
+       }
+      throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
     }
 
     const data = await response.json();
+     // Console log για να δεις το JSON που πήρες (χρήσιμο για debug)
+    console.log("Parsed Response Data:", data);
+
     hideTyping();
 
-    const reply = data.queryResult?.fulfillmentText || "Δεν κατάλαβα, μπορείς να επαναλάβεις;";
+    // --- ΔΙΟΡΘΩΜΕΝΗ ΓΡΑΜΜΗ ΕΔΩ ---
+    const reply = data.queryResult?.responseMessages?.[0]?.text?.text?.[0] || "Δεν κατάλαβα, μπορείς να επαναλάβεις;";
+    // --- ΤΕΛΟΣ ΔΙΟΡΘΩΣΗΣ ---
+
+     // Console log για να δεις την απάντηση που εξάχθηκε (χρήσιμο για debug)
+    console.log("Extracted Reply:", reply);
+
     addMessage(reply, 'bot');
     notifSound.play();
 
@@ -219,6 +242,7 @@ userInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') sendMessage();
 });
 
+// Το κουμπί επανεκκίνησης παραμένει ίδιο
 const restartBtn = document.createElement('button');
 restartBtn.id = 'restart-btn';
 restartBtn.innerText = 'Ξεκίνα από την αρχή';
