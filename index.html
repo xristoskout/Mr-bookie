@@ -18,9 +18,9 @@
 
     #chatbox {
       position: fixed;
-      bottom: 20px;
+      bottom: 100px; /* ↑ Ανεβασμένο για να μην επικαλύπτεται με το ElevenLabs widget */
       right: 20px;
-      width: 350px;
+      width: 360px;
       height: 500px;
       background: white;
       border-radius: 20px;
@@ -143,6 +143,10 @@
 
 <audio id="notif-sound" src="https://notificationsounds.com/storage/sounds/file-sounds-1153-pristine.mp3" preload="auto"></audio>
 
+<!-- ElevenLabs Convai Widget -->
+<elevenlabs-convai agent-id="1IMTPwXoz1AMlW9LaMgY"></elevenlabs-convai>
+<script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+
 <script>
 const apiUrl = "https://bookie-fastapi-229617631808.europe-west1.run.app/chat"; // <-- Βάλε εδώ το σωστό URL του Cloud Run!
 
@@ -160,8 +164,6 @@ function generateSessionId() {
 function addMessage(text, sender) {
   const msg = document.createElement('div');
   msg.classList.add('message', sender);
-  // Χρησιμοποίησε innerHTML για να επιτρέψεις απλές HTML tags αν χρειαστεί (προαιρετικά)
-  // Για ασφάλεια, αν δεν περιμένεις HTML, το innerText είναι καλύτερο.
   msg.innerText = text;
   messagesDiv.appendChild(msg);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -198,33 +200,25 @@ async function sendMessage() {
       }),
     });
 
-    // Console log για να δεις την ακατέργαστη απάντηση (χρήσιμο για debug)
     console.log("Raw Response Status:", response.status);
 
-
     if (!response.ok) {
-       // Προσπάθησε να διαβάσεις το σώμα της απάντησης ακόμα και αν είναι σφάλμα
-       let errorBody = "Could not read error body";
-       try {
-           errorBody = await response.text(); // Διάβασε ως κείμενο για να δεις τι είναι
-           console.error("Error Response Body:", errorBody);
-       } catch(e) {
-           console.error("Could not read error body:", e);
-       }
+      let errorBody = "Could not read error body";
+      try {
+        errorBody = await response.text();
+        console.error("Error Response Body:", errorBody);
+      } catch(e) {
+        console.error("Could not read error body:", e);
+      }
       throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
     }
 
     const data = await response.json();
-     // Console log για να δεις το JSON που πήρες (χρήσιμο για debug)
     console.log("Parsed Response Data:", data);
 
     hideTyping();
 
-    // --- ΔΙΟΡΘΩΜΕΝΗ ΓΡΑΜΜΗ ΕΔΩ ---
     const reply = data.queryResult?.responseMessages?.[0]?.text?.text?.[0] || "Δεν κατάλαβα, μπορείς να επαναλάβεις;";
-    // --- ΤΕΛΟΣ ΔΙΟΡΘΩΣΗΣ ---
-
-     // Console log για να δεις την απάντηση που εξάχθηκε (χρήσιμο για debug)
     console.log("Extracted Reply:", reply);
 
     addMessage(reply, 'bot');
@@ -242,7 +236,6 @@ userInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') sendMessage();
 });
 
-// Το κουμπί επανεκκίνησης παραμένει ίδιο
 const restartBtn = document.createElement('button');
 restartBtn.id = 'restart-btn';
 restartBtn.innerText = 'Ξεκίνα από την αρχή';
@@ -251,7 +244,6 @@ restartBtn.onclick = () => {
   sessionId = generateSessionId();
 };
 document.getElementById('chatbox').appendChild(restartBtn);
-
 </script>
 
 </body>
