@@ -4,64 +4,48 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mr Bookie Chat</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-  @tailwind base;
-@tailwind components;
-@tailwind utilities;
+    .bg-wrapper {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+    .bg-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('https://imagedelivery.net/1KomXrSWiTojGGip43n0SQ/026163c3-0871-4238-fc5f-6b63d0f9eb00/public');
+      background-position: center center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      z-index: -1;
+    }
 
-.bg-wrapper {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.bg-wrapper::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: url('https://imagedelivery.net/1KomXrSWiTojGGip43n0SQ/026163c3-0871-4238-fc5f-6b63d0f9eb00/public');
-  background-position: center center; /* Ensures the image is centered */
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  z-index: -1;
-}
-
-.content-container {
-  width: 100%;
-  max-width: 1200px;
-  padding: 2rem;
-  z-index: 1;
-  text-align: center;
-}
-
-/* Media query for mobile devices */
-@media (max-width: 768px) {
-  .bg-wrapper::before {
-    /* Mobile-specific background adjustments if needed */
-    background-attachment: scroll; /* Better performance on mobile */
-  }
-
-  .content-container {
-    padding: 1rem;
-  }
-}
+    .content-container {
+      width: 100%;
+      max-width: 1200px;
+      padding: 2rem;
+      z-index: 1;
+      text-align: center;
+    }
 
     #chatbox {
       position: fixed;
-      bottom: 150px; /* ↑ Ανεβασμένο για να μην επικαλύπτεται με το ElevenLabs widget */
+      bottom: 150px;
       right: 20px;
       width: 260px;
       height: 400px;
@@ -104,6 +88,7 @@ body {
       background-color: #e0f2ff;
       align-self: flex-end;
       text-align: right;
+      margin-left: auto;
     }
 
     .bot {
@@ -137,6 +122,9 @@ body {
       margin-left: 10px;
       cursor: pointer;
       font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #typing {
@@ -170,123 +158,120 @@ body {
       font-size: 14px;
       display: block;
     }
+
+    @media (max-width: 768px) {
+      .bg-wrapper::before {
+        background-attachment: scroll;
+      }
+
+      .content-container {
+        padding: 1rem;
+      }
+      
+      #chatbox {
+        width: 90%;
+        right: 5%;
+        left: 5%;
+        bottom: 20px;
+      }
+    }
   </style>
 </head>
-
 <body>
-
-<div id="chatbox">
-  <div id="messages"></div>
-
-  <div id="input-area">
-    <input type="text" id="user-input" placeholder="Γράψε το μήνυμά σου...">
-    <button id="send-btn">➤</button>
+  <div class="bg-wrapper">
+    <div class="content-container">
+      <div id="chatbox">
+        <div id="messages"></div>
+        <div id="input-area">
+          <input type="text" id="user-input" placeholder="Γράψε το μήνυμά σου...">
+          <button id="send-btn">➤</button>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<audio id="notif-sound" src="https://notificationsounds.com/storage/sounds/file-sounds-1153-pristine.mp3" preload="auto"></audio>
+  <audio id="notif-sound" src="https://notificationsounds.com/storage/sounds/file-sounds-1153-pristine.mp3" preload="auto"></audio>
+  <elevenlabs-convai agent-id="1IMTPwXoz1AMlW9LaMgY"></elevenlabs-convai>
+  <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
 
-<elevenlabs-convai agent-id="1IMTPwXoz1AMlW9LaMgY"></elevenlabs-convai><script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
-  
-<script>
-const apiUrl = "https://bookie-fastapi-229617631808.europe-west1.run.app/chat"; // <-- Βάλε εδώ το σωστό URL του Cloud Run!
+  <script>
+    const apiUrl = "https://bookie-fastapi-229617631808.europe-west1.run.app/chat";
+    const messagesDiv = document.getElementById('messages');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const notifSound = document.getElementById('notif-sound');
 
-const messagesDiv = document.getElementById('messages');
-const userInput = document.getElementById('user-input');
-const sendBtn = document.getElementById('send-btn');
-const notifSound = document.getElementById('notif-sound');
+    let sessionId = Math.random().toString(36).substr(2, 9);
 
-let sessionId = generateSessionId();
-
-function generateSessionId() {
-  return Math.random().toString(36).substr(2, 9);
-}
-
-function addMessage(text, sender) {
-  const msg = document.createElement('div');
-  msg.classList.add('message', sender);
-  msg.innerText = text;
-  messagesDiv.appendChild(msg);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-function showTyping() {
-  const typing = document.createElement('div');
-  typing.id = 'typing';
-  typing.innerHTML = 'Ο Mr Bookie γράφει<span>...</span>';
-  messagesDiv.appendChild(typing);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-function hideTyping() {
-  const typing = document.getElementById('typing');
-  if (typing) typing.remove();
-}
-
-async function sendMessage() {
-  const text = userInput.value.trim();
-  if (!text) return;
-
-  addMessage(text, 'user');
-  userInput.value = '';
-  showTyping();
-
-  try {
-    const response = await fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: text,
-        session_id: sessionId
-      }),
-    });
-
-    console.log("Raw Response Status:", response.status);
-
-    if (!response.ok) {
-      let errorBody = "Could not read error body";
-      try {
-        errorBody = await response.text();
-        console.error("Error Response Body:", errorBody);
-      } catch(e) {
-        console.error("Could not read error body:", e);
-      }
-      throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+    function addMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.classList.add('message', sender);
+      msg.innerText = text;
+      messagesDiv.appendChild(msg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
-    const data = await response.json();
-    console.log("Parsed Response Data:", data);
+    function showTyping() {
+      const typing = document.createElement('div');
+      typing.id = 'typing';
+      typing.innerHTML = 'Ο Mr Bookie γράφει<span>...</span>';
+      messagesDiv.appendChild(typing);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
 
-    hideTyping();
+    function hideTyping() {
+      const typing = document.getElementById('typing');
+      if (typing) typing.remove();
+    }
 
-    const reply = data.queryResult?.responseMessages?.[0]?.text?.text?.[0] || "Δεν κατάλαβα, μπορείς να επαναλάβεις;";
-    console.log("Extracted Reply:", reply);
+    async function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text) return;
 
-    addMessage(reply, 'bot');
-    notifSound.play();
+      addMessage(text, 'user');
+      userInput.value = '';
+      showTyping();
 
-  } catch (error) {
-    console.error('Error sending message:', error);
-    hideTyping();
-    addMessage("Σφάλμα σύνδεσης 😞", 'bot');
-  }
-}
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: text,
+            session_id: sessionId
+          }),
+        });
 
-sendBtn.addEventListener('click', sendMessage);
-userInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') sendMessage();
-});
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-const restartBtn = document.createElement('button');
-restartBtn.id = 'restart-btn';
-restartBtn.innerText = 'Ξεκίνα από την αρχή';
-restartBtn.onclick = () => {
-  messagesDiv.innerHTML = '';
-  sessionId = generateSessionId();
-};
-document.getElementById('chatbox').appendChild(restartBtn);
-</script>
+        const data = await response.json();
+        const reply = data.queryResult?.responseMessages?.[0]?.text?.text?.[0] || "Δεν κατάλαβα, μπορείς να επαναλάβεις;";
+        
+        hideTyping();
+        addMessage(reply, 'bot');
+        notifSound.play();
+      } catch (error) {
+        console.error('Error sending message:', error);
+        hideTyping();
+        addMessage("Σφάλμα σύνδεσης 😞", 'bot');
+      }
+    }
 
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    const restartBtn = document.createElement('button');
+    restartBtn.id = 'restart-btn';
+    restartBtn.innerText = 'Ξεκίνα από την αρχή';
+    restartBtn.onclick = () => {
+      messagesDiv.innerHTML = '';
+      sessionId = Math.random().toString(36).substr(2, 9);
+    };
+    document.getElementById('chatbox').appendChild(restartBtn);
+  </script>
 </body>
 </html>
-
