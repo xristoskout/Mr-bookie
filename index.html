@@ -56,23 +56,16 @@
       --df-messenger-message-bot-background: #fff;
     }
 
-    @media (max-width: 768px) {
-      .bg-wrapper::before {
-        background-attachment: scroll;
-      }
-
-      .content-container {
-        padding: 1rem;
-      }
-
-        df-messenger {
-    right: 10px;
+   /* ✅ ΜΟΝΟ για κινητά */
+@media (max-width: 768px) {
+  df-messenger {
+    bottom: 20px;
     left: 10px;
-    bottom: 20px; /* Πρόσθεσέ το για σιγουριά */
-    width: auto;
+    right: auto;            /* Απενεργοποιούμε το δεξί περιθώριο */
+    transform: scale(0.85); /* Κάνει το widget μικρότερο */
+    transform-origin: bottom left; /* Σημείο σμίκρυνσης */
   }
-
-    }
+}
   </style>
 </head>
 <body>
