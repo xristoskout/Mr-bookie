@@ -1,13 +1,13 @@
-<!-- ΠΡΟΕΡΧΕΤΑΙ ΑΠΟ ΤΗΝ ΠΡΟΗΓΟΥΜΕΝΗ ΕΚΔΟΣΗ -->
-<!-- ΜΟΝΟ οι δύο διορθώσεις έχουν προστεθεί -->
-
 <!DOCTYPE html>
 <html lang="el">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mr Booky</title>
-  <style>
+  
+   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+   
+  <style> 
     :root {
       --bot-color: #ffcc66;
       --user-color: #ff6666;
@@ -119,42 +119,52 @@
       height: 28px;
       border-radius: 50%;
     }
-   .input-area {
-     display: flex;
-     padding: 10px;
-     border-top: 1px solid #ccc;
-     flex-wrap: nowrap;
-     align-items: flex-end;
-     gap: 8px;
-}
+    .input-area {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+      flex-wrap: nowrap;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+      resize: none;
+      height: 2.5em;
+      line-height: 1.2em;
+      overflow-y: auto;
+      max-height: 4.5em;
+    }
 
-.input-area input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 1em;
-  resize: none;
-  height: 2.5em;
-  line-height: 1.2em;
-  overflow-y: auto;
-  max-height: 4.5em;
-}
+    /* 👇 ΝΕΟ ΚΟΥΜΠΙ */
+    .input-area button {
+      background: var(--user-color);
+      border: none;
+      border-radius: 50%;
+      width: 4.5em;
+      height: 4.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      flex-shrink: 0;
+      padding: 0;
+    }
 
-.input-area button {
-  flex: 1;
-  padding: 10px 14px;
-  background: var(--user-color);
-  border: none;
-  border-radius: 10px;
-  color: white;
-  cursor: pointer;
-  height: 4.5em;
-  line-height: 1.2em;
-  overflow-y: auto;
-  max-height: 4.5em;
-  flex-shrink: 0;
-}
+    .input-area button:hover {
+      background: #ff4d4d;
+      transform: scale(1.1);
+    }
+
+    .input-area button .material-icons {
+      color: white;
+      font-size: 1.4em;
+    }
 
     .typing {
       font-style: italic;
@@ -180,7 +190,9 @@
       <div class="chat-messages" id="chat-messages"></div>
       <div class="input-area">
         <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." onkeydown="if(event.key === 'Enter') sendMessage()" />
-        <button onclick="sendMessage()">Αποστολή</button>
+        <button onclick="sendMessage()" title="Αποστολή">
+          <span class="material-icons">send</span>
+        </button>
       </div>
     </div>
   </div>
@@ -248,4 +260,3 @@
   </script>
 </body>
 </html>
-
