@@ -1,222 +1,180 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8">
-  <title>Mr Booky Chat</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mr Booky</title>
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --bot-color: #ffcc66;
+      --user-color: #ff6666;
+      --background: #fff8f0;
+      --text: #000;
     }
-
+    body.dark {
+      --bot-color: #663300;
+      --user-color: #cc3300;
+      --background: #1e1e1e;
+      --text: #fff;
+    }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #fef8f0;
       margin: 0;
-      padding: 0;
-      height: 100vh;
-      overflow: hidden;
+      font-family: "Segoe UI", sans-serif;
+      background: var(--background);
+      color: var(--text);
     }
-
-    .chat-wrapper {
-      position: absolute;
-      right: 20px;
+    .chatbox {
+      position: fixed;
       bottom: 20px;
+      right: 20px;
       height: 75vh;
-      width: calc(60vh);
-      max-width: 440px;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 40vh;
+      max-width: 90vw;
+      max-height: 90vh;
       display: flex;
       flex-direction: column;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.25);
       overflow: hidden;
-      transition: all 0.3s ease;
+      background: var(--background);
     }
-
+    @media (max-width: 768px) {
+      .chatbox {
+        width: 80vw;
+        height: 75vh;
+        right: 10%;
+      }
+    }
     .chat-header {
-      background-color: #ff7043;
-      color: white;
-      padding: 12px 16px;
-      font-size: 1.2em;
-      font-weight: bold;
+      background: var(--bot-color);
+      padding: 10px;
       text-align: center;
-    }
-
-    .messages {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-      background: #fff5eb;
-    }
-
-    .message {
-      margin-bottom: 18px;
-      padding: 14px 18px;
-      border-radius: 12px;
-      width: 100%;
-      animation: fadeIn 0.3s ease;
+      font-weight: bold;
+      font-size: 1.2em;
       position: relative;
-      line-height: 1.5em;
     }
-
-    .user {
-      background-color: #ffe0b2;
-      align-self: flex-end;
-      text-align: right;
-    }
-
-    .bot {
-      background-color: #ffccbc;
-      align-self: flex-start;
-      padding-left: 52px;
-    }
-
-    .bot::before {
-      content: "";
-      background-image: url("https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/BOOKY.TELIKO.HQ.png");
-      background-size: cover;
-      width: 32px;
-      height: 32px;
+    .dark-toggle {
       position: absolute;
-      left: 10px;
       top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .message {
+      padding: 10px 14px;
+      border-radius: 15px;
+      max-width: 100%;
+      word-wrap: break-word;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .bot {
+      background: var(--bot-color);
+      align-self: flex-start;
+    }
+    .user {
+      background: var(--user-color);
+      align-self: flex-end;
+    }
+    .bot img {
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
     }
-
     .input-area {
       display: flex;
-      border-top: 1px solid #ffc1a1;
+      padding: 10px;
+      border-top: 1px solid #ccc;
     }
-
-    input {
+    .input-area input {
       flex: 1;
-      padding: 12px;
-      border: none;
-      outline: none;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
       font-size: 1em;
     }
-
-    button {
-      padding: 12px 18px;
+    .input-area button {
+      margin-left: 10px;
+      padding: 10px 15px;
+      background: var(--user-color);
       border: none;
-      background: #ff7043;
+      border-radius: 10px;
       color: white;
-      font-size: 1em;
       cursor: pointer;
     }
-
-    .chips {
-      margin-top: 8px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+    .typing {
+      font-style: italic;
+      opacity: 0.6;
+      animation: blink 1s steps(1) infinite;
     }
-
-    .chip {
-      padding: 6px 12px;
-      background-color: #ffe0b2;
-      border-radius: 16px;
-      cursor: pointer;
-      font-size: 0.9em;
-      transition: background 0.2s;
-    }
-
-    .chip:hover {
-      background-color: #ffcc80;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 768px) {
-      .chat-wrapper {
-        width: 90%;
-        height: 80vh;
-        right: 5%;
-        bottom: 10px;
-      }
+    @keyframes blink {
+      0%, 100% { opacity: 0.6 }
+      50% { opacity: 0.2 }
     }
   </style>
 </head>
 <body>
-  <div class="chat-wrapper">
-    <div class="chat-header">Mr Booky</div>
-    <div class="messages" id="messages"></div>
+  <div class="chatbox">
+    <div class="chat-header">
+      Mr Booky
+      <span class="dark-toggle">🌓</span>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
     <div class="input-area">
-      <input id="userInput" type="text" placeholder="Πληκτρολόγησε...">
+      <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." />
       <button onclick="sendMessage()">Αποστολή</button>
     </div>
   </div>
-
+  <audio id="botSound" src="https://drive.google.com/file/d/1YphmuYwUfLZVslGdL1ZaTEvZqQ3jgYcS/view?usp=sharing" preload="auto"></audio>
   <script>
-    const API_URL = 'https://ui-api-for-github-160866660933.europe-west1.run.app/chat';
-    const messagesContainer = document.getElementById('messages');
-    const inputField = document.getElementById('userInput');
+    const chatMessages = document.getElementById("chat-messages");
+    const userInput = document.getElementById("user-input");
+    const botSound = document.getElementById("botSound");
 
-    function addMessage(text, sender = 'bot') {
-      const messageEl = document.createElement('div');
-      messageEl.className = 'message ' + sender;
-      messageEl.innerText = text;
-      messagesContainer.appendChild(messageEl);
-
-      // Auto scroll
-      setTimeout(() => {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      }, 100);
-    }
-
-    function addChips(chips) {
-      const chipsContainer = document.createElement('div');
-      chipsContainer.className = 'chips';
-
-      chips.forEach(chip => {
-        const chipEl = document.createElement('div');
-        chipEl.className = 'chip';
-        chipEl.innerText = chip;
-        chipEl.onclick = () => {
-          inputField.value = chip;
-          sendMessage();
-        };
-        chipsContainer.appendChild(chipEl);
-      });
-
-      messagesContainer.appendChild(chipsContainer);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    async function sendMessage() {
-      const message = inputField.value.trim();
-      if (!message) return;
-
-      addMessage(message, 'user');
-      inputField.value = '';
-
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: message, session_id: 'web-session-1' })
-        });
-
-        const data = await response.json();
-        const reply = data.queryResult?.responseMessages?.[0]?.text?.text?.[0] || 'Δεν έλαβα απάντηση.';
-        addMessage(reply, 'bot');
-
-        const richContent = data.queryResult?.responseMessages?.find(r => r.payload)?.payload?.richContent;
-        if (richContent && Array.isArray(richContent[0])) {
-          const chipBlock = richContent[0].find(item => item.type === 'chips');
-          if (chipBlock) {
-            const chipLabels = chipBlock.options.map(opt => opt.text);
-            addChips(chipLabels);
-          }
-        }
-      } catch (err) {
-        addMessage('Σφάλμα σύνδεσης με το bot.', 'bot');
-        console.error(err);
+    function appendMessage(content, sender) {
+      const message = document.createElement("div");
+      message.classList.add("message", sender);
+      if (sender === "bot") {
+        message.innerHTML = '<img src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/BOOKY.TELIKO.HQ.png" alt="bot" />' + '<span>' + content + '</span>';
+      } else {
+        message.textContent = content;
       }
+      chatMessages.appendChild(message);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+
+    function sendMessage() {
+      const text = userInput.value.trim();
+      if (text === "") return;
+      appendMessage(text, "user");
+      userInput.value = "";
+      simulateBotResponse(text);
+    }
+
+    function simulateBotResponse(userText) {
+      const typing = document.createElement("div");
+      typing.classList.add("message", "bot", "typing");
+      typing.textContent = "Ο Mr Booky γράφει...";
+      chatMessages.appendChild(typing);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      setTimeout(() => {
+        typing.remove();
+        appendMessage("" + userText, "bot");
+        botSound.play();
+      }, 1500);
+    }
+
+    document.querySelector(".dark-toggle").addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+    });
   </script>
 </body>
 </html>
