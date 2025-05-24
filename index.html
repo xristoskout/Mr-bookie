@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="el">
 <head>
@@ -23,10 +25,21 @@
       background: var(--background);
       color: var(--text);
     }
-    .chatbox {
+    .chatbox-wrapper {
       position: fixed;
       bottom: 20px;
       right: 20px;
+      z-index: 1000;
+    }
+    .toggle-chatbox {
+      background: var(--bot-color);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .chatbox {
       height: 75vh;
       width: 40vh;
       max-width: 90vw;
@@ -37,6 +50,10 @@
       box-shadow: 0 8px 16px rgba(0,0,0,0.25);
       overflow: hidden;
       background: var(--background);
+      display: none;
+    }
+    .chatbox.open {
+      display: flex;
     }
     @media (max-width: 768px) {
       .chatbox {
@@ -53,11 +70,17 @@
       font-size: 1.2em;
       position: relative;
     }
-    .dark-toggle {
+    .dark-toggle, .close-chatbox {
       position: absolute;
       top: 10px;
-      right: 10px;
       cursor: pointer;
+    }
+    .dark-toggle {
+      right: 35px;
+    }
+    .close-chatbox {
+      right: 10px;
+      font-weight: bold;
     }
     .chat-messages {
       flex: 1;
@@ -70,7 +93,7 @@
     .message {
       padding: 10px 14px;
       border-radius: 15px;
-      max-width: 100%;
+      width: 100%;
       word-wrap: break-word;
       display: flex;
       align-items: flex-start;
@@ -83,6 +106,7 @@
     .user {
       background: var(--user-color);
       align-self: flex-end;
+      justify-content: flex-end;
     }
     .bot img {
       width: 28px;
@@ -96,14 +120,14 @@
     }
     .input-area input {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
       border-radius: 10px;
       border: 1px solid #ccc;
       font-size: 1em;
     }
     .input-area button {
       margin-left: 10px;
-      padding: 10px 15px;
+      padding: 12px 15px;
       background: var(--user-color);
       border: none;
       border-radius: 10px;
@@ -122,28 +146,44 @@
   </style>
 </head>
 <body>
-  <div class="chatbox">
-    <div class="chat-header">
-      Mr Booky
-      <span class="dark-toggle">🌓</span>
-    </div>
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="input-area">
-      <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." />
-      <button onclick="sendMessage()">Αποστολή</button>
+  <div class="chatbox-wrapper">
+    <button class="toggle-chatbox" onclick="toggleChat()">💬 Mr Booky</button>
+    <div class="chatbox" id="chatbox">
+      <div class="chat-header">
+        Mr Booky
+        <span class="dark-toggle" onclick="toggleDark()">🌓</span>
+        <span class="close-chatbox" onclick="toggleChat()">✖</span>
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="input-area">
+        <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." />
+        <button onclick="sendMessage()">Αποστολή</button>
+      </div>
     </div>
   </div>
-  <audio id="botSound" src="https://drive.google.com/file/d/1YphmuYwUfLZVslGdL1ZaTEvZqQ3jgYcS/view?usp=sharing" preload="auto"></audio>
+
+  <audio id="botSound" src="https://notificationsounds.com/storage/sounds/file-sounds-1142-pristine.mp3" preload="auto"></audio>
+
   <script>
+    const chatbox = document.getElementById("chatbox");
     const chatMessages = document.getElementById("chat-messages");
     const userInput = document.getElementById("user-input");
     const botSound = document.getElementById("botSound");
+
+    function toggleChat() {
+      chatbox.classList.toggle("open");
+    }
+
+    function toggleDark() {
+      document.body.classList.toggle("dark");
+    }
 
     function appendMessage(content, sender) {
       const message = document.createElement("div");
       message.classList.add("message", sender);
       if (sender === "bot") {
         message.innerHTML = '<img src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/BOOKY.TELIKO.HQ.png" alt="bot" />' + '<span>' + content + '</span>';
+        botSound.play();
       } else {
         message.textContent = content;
       }
@@ -156,10 +196,10 @@
       if (text === "") return;
       appendMessage(text, "user");
       userInput.value = "";
-      simulateBotResponse(text);
+      simulateBotResponse();
     }
 
-    function simulateBotResponse(userText) {
+    function simulateBotResponse() {
       const typing = document.createElement("div");
       typing.classList.add("message", "bot", "typing");
       typing.textContent = "Ο Mr Booky γράφει...";
@@ -167,14 +207,9 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
       setTimeout(() => {
         typing.remove();
-        appendMessage("" + userText, "bot");
-        botSound.play();
+        appendMessage("Πώς μπορώ να βοηθήσω;", "bot");
       }, 1500);
     }
-
-    document.querySelector(".dark-toggle").addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-    });
   </script>
 </body>
 </html>
