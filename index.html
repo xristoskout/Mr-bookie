@@ -1,89 +1,90 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mr Bookie Chat</title>
+  <meta charset="UTF-8" />
+  <title>Mr. Booky Chat</title>
   <style>
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-
-  .bg-wrapper {
-    min-height: 100vh;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-
-  .bg-wrapper::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/BOOKY.TELIKO.HQ.png');
-    background-position: center center;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    z-index: -1;
-  }
-
-  df-messenger {
-    z-index: 999;
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    --df-messenger-font-color: #1a1a1a;
-    --df-messenger-font-family: 'Segoe UI', sans-serif;
-    --df-messenger-chat-background: #fff;
-    --df-messenger-message-user-background: #d6e4ff;
-    --df-messenger-message-bot-background: #f5f7fa;
-    --df-messenger-send-icon: #ff4081;
-    --df-messenger-button-titlebar-color: #ff4081;
-  }
-
-  @media (max-width: 768px) {
-    df-messenger {
-      bottom: 20px;
-      right: 10px;
-      left: auto;
-      transform: scale(0.95);
-      transform-origin: bottom left;
-    }
-  }
-</style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #chatbox { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
+    .message { margin: 5px 0; }
+    .user { text-align: right; color: blue; }
+    .bot { text-align: left; color: green; }
+    .chip { display: inline-block; background: #eee; border-radius: 16px; padding: 8px 12px; margin: 5px; cursor: pointer; }
+    input { width: 80%; padding: 10px; }
+    button { padding: 10px; }
+  </style>
 </head>
 <body>
-  <div class="bg-wrapper">
-    <div class="content-container">
-      <!-- Εδώ μπορείς να βάλεις έξτρα περιεχόμενο αν θέλεις -->
-    </div>
-  </div>
 
-  <!-- Ειδοποίηση ήχου (προαιρετική) -->
-  <audio id="notif-sound" src="https://notificationsounds.com/storage/sounds/file-sounds-1153-pristine.mp3" preload="auto"></audio>
+<h2>Mr. Booky Bot</h2>
+<div id="chatbox"></div>
 
-  <!-- Dialogflow CX Widget -->
-  <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
-  <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
-  <df-messenger
-    location="europe-west1"
-    project-id="mr-bookie"
-    agent-id="c6d9d3fb-e8ab-4d6e-9e29-61f68daeb71c"
-    language-code="el"
-    max-query-length="-1">
-    <df-messenger-chat-bubble
-      chat-title="Mr Bookie">
-    </df-messenger-chat-bubble>
-  </df-messenger>
+<input type="text" id="userInput" placeholder="Γράψε κάτι..." />
+<button onclick="sendMessage()">Αποστολή</button>
+
+<script>
+const chatbox = document.getElementById("chatbox");
+const input = document.getElementById("userInput");
+const SESSION_ID = Math.random().toString(36).substring(7); // μοναδικό για κάθε χρήστη
+const API_URL = "https://ui-api-for-github-160866660933.europe-west1.run.app/chat"; // <-- άλλαξέ το με το δικό σου URL
+
+function addMessage(text, sender) {
+  const msg = document.createElement("div");
+  msg.className = `message ${sender}`;
+  msg.innerHTML = text;
+  chatbox.appendChild(msg);
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+function addChips(chips) {
+  chips.forEach(chip => {
+    const btn = document.createElement("div");
+    btn.className = "chip";
+    btn.innerText = chip;
+    btn.onclick = () => {
+      input.value = chip;
+      sendMessage();
+    };
+    chatbox.appendChild(btn);
+  });
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+async function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+  addMessage(text, "user");
+  input.value = "";
+
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text, session_id: SESSION_ID })
+  });
+
+  const data = await res.json();
+
+  // Βασική απάντηση
+  const botText = data.queryResult.fulfillmentText;
+  if (botText) addMessage(botText, "bot");
+
+  // Αν υπάρχουν suggestion chips μέσα στο payload
+  try {
+    const payload = data.queryResult.responseMessages.find(msg => msg.payload)?.payload;
+    if (payload?.richContent) {
+      // Dialogflow rich content format
+      payload.richContent.flat().forEach(item => {
+        if (item.type === "chips" && item.options) {
+          const suggestions = item.options.map(opt => opt.text);
+          addChips(suggestions);
+        }
+      });
+    }
+  } catch (e) {
+    console.warn("No rich content found.");
+  }
+}
+</script>
+
 </body>
 </html>
