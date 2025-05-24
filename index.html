@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="el">
 <head>
@@ -25,21 +23,10 @@
       background: var(--background);
       color: var(--text);
     }
-    .chatbox-wrapper {
+    .chatbox {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      z-index: 1000;
-    }
-    .toggle-chatbox {
-      background: var(--bot-color);
-      border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .chatbox {
       height: 75vh;
       width: 40vh;
       max-width: 90vw;
@@ -50,10 +37,7 @@
       box-shadow: 0 8px 16px rgba(0,0,0,0.25);
       overflow: hidden;
       background: var(--background);
-      display: none;
-    }
-    .chatbox.open {
-      display: flex;
+      z-index: 9999;
     }
     @media (max-width: 768px) {
       .chatbox {
@@ -70,31 +54,27 @@
       font-size: 1.2em;
       position: relative;
     }
-    .dark-toggle, .close-chatbox {
+    .dark-toggle, .close-chat {
       position: absolute;
       top: 10px;
       cursor: pointer;
     }
-    .dark-toggle {
-      right: 35px;
-    }
-    .close-chatbox {
-      right: 10px;
-      font-weight: bold;
-    }
+    .dark-toggle { right: 35px; }
+    .close-chat { right: 10px; font-weight: bold; }
+
     .chat-messages {
       flex: 1;
       padding: 10px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
     .message {
       padding: 10px 14px;
       border-radius: 15px;
       width: 100%;
-      word-wrap: break-word;
+      box-sizing: border-box;
       display: flex;
       align-items: flex-start;
       gap: 10px;
@@ -106,7 +86,6 @@
     .user {
       background: var(--user-color);
       align-self: flex-end;
-      justify-content: flex-end;
     }
     .bot img {
       width: 28px;
@@ -127,7 +106,7 @@
     }
     .input-area button {
       margin-left: 10px;
-      padding: 12px 15px;
+      padding: 10px 15px;
       background: var(--user-color);
       border: none;
       border-radius: 10px;
@@ -143,35 +122,46 @@
       0%, 100% { opacity: 0.6 }
       50% { opacity: 0.2 }
     }
+    #chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9998;
+      background: var(--bot-color);
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
-  <div class="chatbox-wrapper">
-    <button class="toggle-chatbox" onclick="toggleChat()">💬 Mr Booky</button>
-    <div class="chatbox" id="chatbox">
-      <div class="chat-header">
-        Mr Booky
-        <span class="dark-toggle" onclick="toggleDark()">🌓</span>
-        <span class="close-chatbox" onclick="toggleChat()">✖</span>
-      </div>
-      <div class="chat-messages" id="chat-messages"></div>
-      <div class="input-area">
-        <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." />
-        <button onclick="sendMessage()">Αποστολή</button>
-      </div>
+  <button id="chat-toggle" onclick="toggleChatbox()">💬 Mr Booky</button>
+  <div class="chatbox" id="chatbox" style="display: none;">
+    <div class="chat-header">
+      Mr Booky
+      <span class="dark-toggle" onclick="toggleDark()">🌓</span>
+      <span class="close-chat" onclick="toggleChatbox()">✖</span>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." />
+      <button onclick="sendMessage()">Αποστολή</button>
     </div>
   </div>
 
   <audio id="botSound" src="https://notificationsounds.com/storage/sounds/file-sounds-1142-pristine.mp3" preload="auto"></audio>
 
   <script>
-    const chatbox = document.getElementById("chatbox");
     const chatMessages = document.getElementById("chat-messages");
     const userInput = document.getElementById("user-input");
+    const chatbox = document.getElementById("chatbox");
     const botSound = document.getElementById("botSound");
 
-    function toggleChat() {
-      chatbox.classList.toggle("open");
+    function toggleChatbox() {
+      chatbox.style.display = chatbox.style.display === "none" ? "flex" : "none";
     }
 
     function toggleDark() {
@@ -181,35 +171,53 @@
     function appendMessage(content, sender) {
       const message = document.createElement("div");
       message.classList.add("message", sender);
+
       if (sender === "bot") {
-        message.innerHTML = '<img src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/BOOKY.TELIKO.HQ.png" alt="bot" />' + '<span>' + content + '</span>';
-        botSound.play();
+        message.innerHTML = `
+          <img src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/BOOKY.TELIKO.HQ.png" alt="bot" />
+          <span>${content}</span>`;
       } else {
         message.textContent = content;
       }
+
       chatMessages.appendChild(message);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function sendMessage() {
+    async function sendMessage() {
       const text = userInput.value.trim();
-      if (text === "") return;
+      if (!text) return;
+
       appendMessage(text, "user");
       userInput.value = "";
-      simulateBotResponse();
-    }
 
-    function simulateBotResponse() {
       const typing = document.createElement("div");
       typing.classList.add("message", "bot", "typing");
       typing.textContent = "Ο Mr Booky γράφει...";
       chatMessages.appendChild(typing);
       chatMessages.scrollTop = chatMessages.scrollHeight;
-      setTimeout(() => {
+
+      try {
+        const res = await fetch("https://ui-api-for-github-160866660933.europe-west1.run.app/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text, session_id: "user-" + Date.now() })
+        });
+        const data = await res.json();
+        const reply = data.queryResult?.responseMessages?.[0]?.text?.text?.[0] || "Δεν κατάλαβα. Προσπαθήστε ξανά.";
         typing.remove();
-        appendMessage("Πώς μπορώ να βοηθήσω;", "bot");
-      }, 1500);
+        appendMessage(reply, "bot");
+        botSound.play();
+      } catch (e) {
+        typing.remove();
+        appendMessage("Σφάλμα επικοινωνίας. Προσπαθήστε ξανά αργότερα.", "bot");
+        console.error(e);
+      }
     }
+
+    userInput.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") sendMessage();
+    });
   </script>
 </body>
 </html>
