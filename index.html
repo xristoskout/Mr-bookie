@@ -1,90 +1,166 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mr. Booky Chat</title>
+  <meta charset="UTF-8">
+  <title>Mr Bookie Chat</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #chatbox { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
-    .message { margin: 5px 0; }
-    .user { text-align: right; color: blue; }
-    .bot { text-align: left; color: green; }
-    .chip { display: inline-block; background: #eee; border-radius: 16px; padding: 8px 12px; margin: 5px; cursor: pointer; }
-    input { width: 80%; padding: 10px; }
-    button { padding: 10px; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f7fc;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 80%;
+    }
+
+    .user {
+      background-color: #d3e3fd;
+      align-self: flex-end;
+    }
+
+    .bot {
+      background-color: #f1f1f1;
+      align-self: flex-start;
+    }
+
+    .input-area {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      outline: none;
+      font-size: 1em;
+    }
+
+    button {
+      padding: 12px 18px;
+      border: none;
+      background: #4285f4;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .chips {
+      margin-top: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      padding: 6px 12px;
+      background-color: #e0e7ff;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background 0.2s;
+    }
+
+    .chip:hover {
+      background-color: #c7d2fe;
+    }
   </style>
 </head>
 <body>
+  <div class="chat-container">
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <input id="userInput" type="text" placeholder="Πληκτρολόγησε...">
+      <button onclick="sendMessage()">Αποστολή</button>
+    </div>
+  </div>
 
-<h2>Mr. Booky Bot</h2>
-<div id="chatbox"></div>
+  <script>
+    const API_URL = 'https://https://ui-api-for-github-160866660933.europe-west1.run.app/chat';
+    const messagesContainer = document.getElementById('messages');
+    const inputField = document.getElementById('userInput');
 
-<input type="text" id="userInput" placeholder="Γράψε κάτι..." />
-<button onclick="sendMessage()">Αποστολή</button>
-
-<script>
-const chatbox = document.getElementById("chatbox");
-const input = document.getElementById("userInput");
-const SESSION_ID = Math.random().toString(36).substring(7); // μοναδικό για κάθε χρήστη
-const API_URL = "https://ui-api-for-github-160866660933.europe-west1.run.app/chat"; // <-- άλλαξέ το με το δικό σου URL
-
-function addMessage(text, sender) {
-  const msg = document.createElement("div");
-  msg.className = `message ${sender}`;
-  msg.innerHTML = text;
-  chatbox.appendChild(msg);
-  chatbox.scrollTop = chatbox.scrollHeight;
-}
-
-function addChips(chips) {
-  chips.forEach(chip => {
-    const btn = document.createElement("div");
-    btn.className = "chip";
-    btn.innerText = chip;
-    btn.onclick = () => {
-      input.value = chip;
-      sendMessage();
-    };
-    chatbox.appendChild(btn);
-  });
-  chatbox.scrollTop = chatbox.scrollHeight;
-}
-
-async function sendMessage() {
-  const text = input.value.trim();
-  if (!text) return;
-  addMessage(text, "user");
-  input.value = "";
-
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text, session_id: SESSION_ID })
-  });
-
-  const data = await res.json();
-
-  // Βασική απάντηση
-  const botText = data.queryResult.fulfillmentText;
-  if (botText) addMessage(botText, "bot");
-
-  // Αν υπάρχουν suggestion chips μέσα στο payload
-  try {
-    const payload = data.queryResult.responseMessages.find(msg => msg.payload)?.payload;
-    if (payload?.richContent) {
-      // Dialogflow rich content format
-      payload.richContent.flat().forEach(item => {
-        if (item.type === "chips" && item.options) {
-          const suggestions = item.options.map(opt => opt.text);
-          addChips(suggestions);
-        }
-      });
+    function addMessage(text, sender = 'bot') {
+      const messageEl = document.createElement('div');
+      messageEl.className = 'message ' + sender;
+      messageEl.innerText = text;
+      messagesContainer.appendChild(messageEl);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-  } catch (e) {
-    console.warn("No rich content found.");
-  }
-}
-</script>
 
+    function addChips(chips) {
+      const chipsContainer = document.createElement('div');
+      chipsContainer.className = 'chips';
+
+      chips.forEach(chip => {
+        const chipEl = document.createElement('div');
+        chipEl.className = 'chip';
+        chipEl.innerText = chip;
+        chipEl.onclick = () => {
+          inputField.value = chip;
+          sendMessage();
+        };
+        chipsContainer.appendChild(chipEl);
+      });
+
+      messagesContainer.appendChild(chipsContainer);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = inputField.value.trim();
+      if (!message) return;
+
+      addMessage(message, 'user');
+      inputField.value = '';
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message, session_id: 'web-session-1' })
+      });
+
+      const data = await response.json();
+      const reply = data.queryResult?.responseMessages?.[0]?.text?.text?.[0] || 'Δεν έλαβα απάντηση.';
+
+      addMessage(reply, 'bot');
+
+      // Εμφάνιση suggestion chips
+      const richContent = data.queryResult?.responseMessages?.find(r => r.payload)?.payload?.richContent;
+      if (richContent && Array.isArray(richContent[0])) {
+        const chipBlock = richContent[0].find(item => item.type === 'chips');
+        if (chipBlock) {
+          const chipLabels = chipBlock.options.map(opt => opt.text);
+          addChips(chipLabels);
+        }
+      }
+    }
+  </script>
 </body>
 </html>
