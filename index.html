@@ -53,9 +53,9 @@
     }
     @media (max-width: 768px) {
       .chatbox {
-        width: 80vw;
+        width: 90vw;
         height: 75vh;
-        right: 10%;
+        right: 5vw;
       }
     }
     .chat-header {
@@ -87,9 +87,9 @@
       gap: 12px;
     }
     .message {
+      max-width: 85%;
       padding: 10px 14px;
       border-radius: 15px;
-      width: 100%;
       word-wrap: break-word;
       display: flex;
       align-items: flex-start;
@@ -113,6 +113,7 @@
       display: flex;
       padding: 10px;
       border-top: 1px solid #ccc;
+      flex-wrap: nowrap;
     }
     .input-area input {
       flex: 1;
@@ -129,6 +130,7 @@
       border-radius: 10px;
       color: white;
       cursor: pointer;
+      white-space: nowrap;
     }
     .typing {
       font-style: italic;
@@ -152,7 +154,7 @@
       </div>
       <div class="chat-messages" id="chat-messages"></div>
       <div class="input-area">
-        <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." />
+        <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." onkeydown="if(event.key==='Enter'){sendMessage()}" />
         <button onclick="sendMessage()">Αποστολή</button>
       </div>
     </div>
