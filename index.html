@@ -119,29 +119,39 @@
       height: 28px;
       border-radius: 50%;
     }
-    .input-area {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #ccc;
-      flex-wrap: nowrap;
-    }
-    .input-area input {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 1em;
-    }
-    .input-area button {
-      margin-left: 10px;
-      padding: 12px 15px;
-      background: var(--user-color);
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-      white-space: nowrap;
-    }
+   .input-area {
+     display: flex;
+     padding: 10px;
+     border-top: 1px solid #ccc;
+     flex-wrap: nowrap;
+     align-items: flex-end;
+     gap: 8px;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+  resize: none;
+  height: 2.5em;
+  line-height: 1.2em;
+  overflow-y: auto;
+  max-height: 4.5em;
+}
+
+.input-area button {
+  padding: 10px 14px;
+  background: var(--user-color);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  height: 2.5em;
+  flex-shrink: 0;
+}
+
     .typing {
       font-style: italic;
       opacity: 0.6;
