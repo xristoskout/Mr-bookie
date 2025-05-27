@@ -1,16 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="el">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mr Booky</title>
-  
-   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-   
-   <style> 
-     
- :root {
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style> 
+    :root {
       --bot-color: #ffcc66;
       --user-color: #ff6666;
       --background: #fff8f0;
@@ -42,40 +38,33 @@
       cursor: pointer;
       font-weight: bold;
     }
-   /* Chatbox Styles */
-  .chatbox {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  display: flex;
-  flex-direction: column;
-  border-radius: 24px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  height: 600px;
-  width: 320px;
-  max-width: calc(100vw - 40px);
-  background: #fff8f0;
-  background-image: url('https://github.com/xristoskout/Mr-bookie/blob/main/Ms%20Booky%20366x567.png?raw=true');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-attachment: local;
-  transition: all 0.3s ease;
-  transform-origin: bottom right;
-}
-
-.chatbox.hidden {
-  display: none;
-}
-
-.chatbox.show {
-  display: flex;
-  animation: slideUp 0.3s ease-out;
-}
-
-.dark .chatbox {
-  background-color: #2d2d2d;
+    .chatbox {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      flex-direction: column;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      height: 600px;
+      width: 320px;
+      max-width: calc(100vw - 40px);
+      background: #fff8f0;
+      background-image: url('https://github.com/xristoskout/Mr-bookie/blob/main/Ms%20Booky%20366x567.png?raw=true');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-attachment: local;
+      display: none;
+      transition: all 0.3s ease;
+      transform-origin: bottom right;
+    }
+    .chatbox.show {
+      display: flex;
+      animation: slideUp 0.3s ease-out;
+    }
+    .dark .chatbox {
+      background-color: #2d2d2d;
     }
     @media (max-width: 768px) {
       .chatbox {
@@ -100,15 +89,9 @@
       cursor: pointer;
       font-weight: bold;
     }
-    .dark-toggle {
-      right: 75px;
-    }
-    .clear-chat {
-      right: 45px;
-    }
-    .close-chatbox {
-      right: 10px;
-    }
+    .dark-toggle { right: 75px; }
+    .clear-chat { right: 45px; }
+    .close-chatbox { right: 10px; }
     .chat-messages {
       flex: 1;
       padding: 10px;
@@ -133,7 +116,6 @@
     .user {
       background: var(--user-color);
       align-self: flex-end;
-      justify-content: flex-end;
     }
     .bot img {
       width: 28px;
@@ -144,7 +126,6 @@
       display: flex;
       padding: 10px;
       border-top: 1px solid #ccc;
-      flex-wrap: nowrap;
       align-items: flex-end;
       gap: 8px;
     }
@@ -154,14 +135,8 @@
       border-radius: 10px;
       border: 1px solid #ccc;
       font-size: 1em;
-      resize: none;
       height: 2.5em;
-      line-height: 1.2em;
-      overflow-y: auto;
-      max-height: 4.5em;
     }
-
-    /* 👇 ΝΕΟ ΚΟΥΜΠΙ */
     .input-area button {
       background: var(--user-color);
       border: none;
@@ -173,20 +148,15 @@
       justify-content: center;
       cursor: pointer;
       transition: background 0.3s ease, transform 0.2s ease;
-      flex-shrink: 0;
-      padding: 0;
     }
-
     .input-area button:hover {
       background: #ff4d4d;
       transform: scale(1.1);
     }
-
     .input-area button .material-icons {
       color: white;
       font-size: 1.4em;
     }
-
     .typing {
       font-style: italic;
       opacity: 0.6;
@@ -225,9 +195,18 @@
   const chatMessages = document.getElementById("chat-messages");
   const userInput = document.getElementById("user-input");
   const botSound = document.getElementById("botSound");
+  let chatOpened = false;
 
   function toggleChat() {
-    chatbox.classList.toggle("open");
+    if (!chatbox.classList.contains("show")) {
+      chatbox.classList.add("show");
+      if (!chatOpened) {
+        appendMessage("Καλώς ήρθατε! Είμαι ο Mr Booky. Πώς μπορώ να σας βοηθήσω;", "bot");
+        chatOpened = true;
+      }
+    } else {
+      chatbox.classList.remove("show");
+    }
   }
 
   function toggleDark() {
@@ -244,13 +223,7 @@
     if (sender === "bot") {
       const linkedText = content.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: blue; text-decoration: underline;">$1</a>');
       message.innerHTML = '<img src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/BOOKY.TELIKO.HQ.png" alt="bot" />' + '<span>' + linkedText + '</span>';
-      
-      // Παίξε ήχο και πιάσε σφάλματα
-      botSound.play().catch((e) => {
-        // Αν ο browser μπλοκάρει τον ήχο, απλά αγνόησε το
-        console.log("Audio play prevented:", e);
-      });
-
+      botSound.play().catch(() => {});
     } else {
       message.textContent = content;
     }
@@ -271,45 +244,24 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     try {
-      console.log("Sending message:", text);
       const response = await fetch("https://ui-api-for-github-160866660933.europe-west1.run.app/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text })
       });
-      
-      console.log("Response status:", response.status);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      console.log("Response data:", data);
-      
       typing.remove();
-      
-      // Check if the response contains the expected reply
-      if (data.reply) {
-        appendMessage(data.reply, "bot");
-      } else {
-        console.error("Unexpected response format:", data);
-        appendMessage("Λάβαμε μη αναμενόμενη απάντηση από τον server.", "bot");
-      }
+      if (data.reply) appendMessage(data.reply, "bot");
+      else appendMessage("Λάβαμε μη αναμενόμενη απάντηση από τον server.", "bot");
+
     } catch (error) {
-      console.error("Error details:", error);
       typing.remove();
-      
-      // More specific error messages
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        appendMessage("Σφάλμα δικτύου. Ελέγξτε τη σύνδεσή σας στο διαδίκτυο.", "bot");
-      } else if (error.message.includes('HTTP error')) {
-        appendMessage(`Σφάλμα server (${error.message}). Προσπαθήστε ξανά σε λίγο.`, "bot");
-      } else {
-        appendMessage("Σφάλμα σύνδεσης. Προσπαθήστε ξανά.", "bot");
-      }
+      appendMessage("Προέκυψε σφάλμα. Προσπαθήστε ξανά.", "bot");
     }
   }
 </script>
 </body>
 </html>
+
