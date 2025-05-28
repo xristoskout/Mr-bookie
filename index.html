@@ -6,167 +6,307 @@
   <title>Mr Booky</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <style> 
-    :root {
-      --bot-color:  #ffdf43;
-      --user-color: #f3a45b;
-      --background: #fff8f0;
-      --text: #000;
-    }
-    body.dark {
-      --bot-color: #663300;
-      --user-color: #cc3300;
-      --background: #1e1e1e;
-      --text: #fff;
-    }
-    body {
-      margin: 0;
-      font-family: "Segoe UI", sans-serif;
-      background: var(--background);
-      color: var(--text);
-    }
-    .chatbox-wrapper {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 1000;
-    }
-    .toggle-chatbox {
-      background: var(--bot-color);
-      border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .chatbox {
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      flex-direction: column;
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      overflow: hidden;
-      height: 550px;
-      width: 400px;
-      max-width: calc(100vw - 40px);
-      background: #fff8f0;
-      background-image: url('https://github.com/xristoskout/Mr-bookie/blob/main/Ms%20Booky%20366x567.png?raw=true');
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-attachment: local;
-      display: none;
-      transition: all 0.3s ease;
-      transform-origin: bottom right;
-    }
-    .chatbox.show {
-      display: flex;
-      animation: slideUp 0.3s ease-out;
-    }
-    .dark .chatbox {
-      background-color: #2d2d2d;
-    }
-    @media (max-width: 768px) {
+    
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --bot-color: #ffdf43;
+    --user-color: #f3a45b;
+    --background: #fff8f0;
+    --text: #000;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --bot-color: #663300;
+    --user-color: #cc3300;
+    --background: #1e1e1e;
+    --text: #fff;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: var(--background);
+    color: var(--text);
+  }
+}
+
+/* Chatbox Styles */
+.chatbox-wrapper {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.toggle-chatbox {
+  background: var(--bot-color);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.chatbox {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  flex-direction: column;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  height: 550px;
+  width: 400px;
+  max-width: calc(100vw - 40px);
+  background: #fff8f0;
+  background-image: url('https://github.com/xristoskout/Mr-bookie/blob/main/Ms%20Booky%20366x567.png?raw=true');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: local;
+  display: none;
+  transition: all 0.3s ease;
+  transform-origin: bottom right;
+}
+
+.chatbox.show {
+  display: flex;
+  animation: slideUp 0.3s ease-out;
+}
+
+.dark .chatbox {
+  background-color: #2d2d2d;
+}
+
+/* Mobile-specific styles for smartphones only */
+@media (max-width: 768px) {
   .chatbox {
-    width: 95vw;
-    height: 90vh;
+    width: calc(100vw - 20px);
+    height: 85vh;
     border-radius: 12px;
     right: auto;
-    left: 2.5vw;
-    bottom: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 10px;
+    background-size: cover;
+    background-position: center center;
+    background-attachment: scroll;
   }
+  
+  .chatbox.show {
+    transform: translateX(-50%);
   }
-    .chat-header {
-      background: var(--bot-color);
-      padding: 10px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.2em;
-      position: relative;
-    }
-    .dark-toggle, .close-chatbox, .clear-chat {
-      position: absolute;
-      top: 10px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .dark-toggle { right: 75px; }
-    .clear-chat { right: 45px; }
-    .close-chatbox { right: 10px; }
-    .chat-messages {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .message {
-      max-width: 90%;
-      padding: 10px 14px;
-      border-radius: 15px;
-      word-wrap: break-word;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    .bot {
-      background: var(--bot-color);
-      align-self: flex-start;
-    }
-    .user {
-      background: var(--user-color);
-      align-self: flex-end;
-    }
-    .bot img {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-    }
-    .input-area {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #ccc;
-      align-items: flex-end;
-      gap: 8px;
-    }
-    .input-area input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 1em;
-      height: 2.5em;
-    }
-    .input-area button {
-      background: var(--user-color);
-      border: none;
-      border-radius: 50%;
-      width: 4.5em;
-      height: 4.5em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.3s ease, transform 0.2s ease;
-    }
-    .input-area button:hover {
-      background: #ff4d4d;
-      transform: scale(1.1);
-    }
-    .input-area button .material-icons {
-      color: white;
-      font-size: 1.4em;
-    }
-    .typing {
-      font-style: italic;
-      opacity: 0.6;
-      animation: blink 1s steps(1) infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 0.6 }
-      50% { opacity: 0.2 }
-    }
+}
+
+.chat-header {
+  background: var(--bot-color);
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2em;
+  position: relative;
+}
+
+.dark-toggle, .close-chatbox, .clear-chat {
+  position: absolute;
+  top: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.dark-toggle { right: 75px; }
+.clear-chat { right: 45px; }
+.close-chatbox { right: 10px; }
+
+.chat-messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message {
+  max-width: 90%;
+  padding: 10px 14px;
+  border-radius: 15px;
+  word-wrap: break-word;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.bot {
+  background: var(--bot-color);
+  align-self: flex-start;
+}
+
+.user {
+  background: var(--user-color);
+  align-self: flex-end;
+}
+
+.bot img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.input-area {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+  height: 2.5em;
+}
+
+.input-area button {
+  background: var(--user-color);
+  border: none;
+  border-radius: 50%;
+  width: 4.5em;
+  height: 4.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.input-area button:hover {
+  background: #ff4d4d;
+  transform: scale(1.1);
+}
+
+.input-area button .material-icons {
+  color: white;
+  font-size: 1.4em;
+}
+
+.typing {
+  font-style: italic;
+  opacity: 0.6;
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.6 }
+  50% { opacity: 0.2 }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
   </style>
 </head>
 <body>
