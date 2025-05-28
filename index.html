@@ -174,20 +174,20 @@
 /* Mobile-specific styles for smartphones only */
 @media (max-width: 768px) {
   .chatbox {
-    width: calc(100vw - 20px);
-    height: 85vh;
-    border-radius: 12px;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
     right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 10px;
+    left: 0;
+    transform: none;
+    bottom: 0;
     background-size: cover;
     background-position: center center;
     background-attachment: scroll;
   }
   
   .chatbox.show {
-    transform: translateX(-50%);
+    transform: none;
   }
 }
 
