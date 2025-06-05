@@ -75,6 +75,8 @@
       font-weight: bold;
       font-size: 1.25rem;
       color: #1f2937;
+      position: relative;
+      z-index: 10;
     }
 
     .chat-messages {
@@ -167,14 +169,8 @@
     }
 
     @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(1rem);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(1rem); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes pulse {
@@ -197,53 +193,6 @@
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-      }
-
-      .chat-header {
-        flex-shrink: 0;
-        font-size: 1rem;
-        padding: 1rem;
-      }
-
-      .chat-messages {
-        flex: 1;
-        overflow-y: auto;
-        padding: 1rem;
-      }
-
-      .input-area {
-        flex-shrink: 0;
-        padding: 0.75rem;
-        background: rgba(255, 255, 255, 0.95);
-        border-top: 1px solid #fbbf24;
-        display: flex;
-        gap: 0.75rem;
-      }
-
-      .input-area input {
-        flex: 1;
-        font-size: 1rem;
-        padding: 0.5rem 0.75rem;
-      }
-
-      .input-area button {
-        width: 2.5rem;
-        height: 2.5rem;
-      }
-
-      .chatbox-wrapper {
-        bottom: 1rem;
-        right: 1rem;
-      }
-
-      .toggle-chatbox {
-        font-size: 1rem;
-        padding: 0.75rem 1.25rem;
-      }
-
-      .message span {
-        font-size: 0.9rem;
-        padding: 0.5rem 0.75rem;
       }
     }
   </style>
@@ -375,13 +324,24 @@
       }
     }
 
-    // ✔ Διορθώνει τη λειτουργία του "X" και σε κινητές συσκευές
-    document.addEventListener("DOMContentLoaded", () => {
+    // ✅ Υποστήριξη click + touchstart για το κουμπί Χ
+    function bindCloseButton() {
       const closeBtn = document.querySelector(".close-chat-btn");
-      if (closeBtn) {
-        closeBtn.addEventListener("click", toggleChat);
-      }
-    });
+      if (!closeBtn) return;
+
+      closeBtn.addEventListener("click", () => {
+        console.log("Κουμπί Χ πατήθηκε");
+        toggleChat();
+      });
+
+      closeBtn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        console.log("Touch Χ πατήθηκε");
+        toggleChat();
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", bindCloseButton);
   </script>
 </body>
 </html>
