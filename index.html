@@ -7,9 +7,9 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <style>
     html, body {
+      height: 100%;
       margin: 0;
       padding: 0;
-      height: 100%;
     }
 
     body {
@@ -50,18 +50,17 @@
       border-radius: 1.5rem;
       overflow: hidden;
       display: none;
-      animation: slideIn 0.3s ease-out;
       background-color: white;
       background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/Ms%20Booky%20366x567.png');
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center center;
       z-index: 1000;
+      flex-direction: column;
     }
 
     .chatbox.show {
       display: flex;
-      flex-direction: column;
     }
 
     .chat-header {
@@ -73,8 +72,6 @@
       font-weight: bold;
       font-size: 1.25rem;
       color: #1f2937;
-      position: relative;
-      z-index: 10;
     }
 
     .chat-messages {
@@ -122,6 +119,12 @@
       color: white;
     }
 
+    .message img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+    }
+
     .input-area {
       padding: 1rem;
       background: rgba(255, 255, 255, 0.95);
@@ -159,28 +162,60 @@
       transform: scale(1.05);
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(1rem); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     @media (max-width: 768px) {
       .chatbox {
         top: 0;
         left: 0;
         width: 100vw;
         height: 100dvh;
+        max-width: 100vw;
+        max-height: 100dvh;
         border-radius: 0;
-        display: flex;
         flex-direction: column;
         z-index: 1000;
+      }
+
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+      }
+
+      .input-area {
+        padding: 0.75rem;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.95);
+        border-top: 1px solid #fbbf24;
+        display: flex;
+        gap: 0.75rem;
+      }
+
+      .input-area input {
+        flex: 1;
+        font-size: 1rem;
+        padding: 0.5rem 0.75rem;
+      }
+
+      .input-area button {
+        width: 2.5rem;
+        height: 2.5rem;
+      }
+
+      .chatbox-wrapper {
+        bottom: 1rem;
+        right: 1rem;
+      }
+
+      .toggle-chatbox {
+        font-size: 1rem;
+        padding: 0.75rem 1.25rem;
       }
     }
   </style>
 </head>
 <body>
   <div class="chatbox-wrapper">
-    <button class="toggle-chatbox" onclick="toggleChat(true)">💬 Mr Booky</button>
+    <button class="toggle-chatbox">💬 Mr Booky</button>
     <div class="chatbox" id="chatbox">
       <div class="chat-header">
         <div>
@@ -192,7 +227,6 @@
           <span class="material-icons" onclick="clearChat()" title="Καθαρισμός" style="cursor: pointer;">delete_sweep</span>
         </div>
       </div>
-
       <div class="chat-messages" id="chat-messages"></div>
       <div class="input-area">
         <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." onkeydown="if(event.key === 'Enter') sendMessage()" />
@@ -203,39 +237,17 @@
     </div>
   </div>
 
-  <audio id="botSound" src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/wet-431.mp3" preload="auto"></audio>
-
   <script>
     const chatbox = document.getElementById("chatbox");
     const toggleBtn = document.querySelector(".toggle-chatbox");
     const chatMessages = document.getElementById("chat-messages");
     const userInput = document.getElementById("user-input");
-    const botSound = document.getElementById("botSound");
 
-    let session_id = localStorage.getItem("chat_session_id");
-    if (!session_id) {
-      session_id = "sess-" + Date.now();
-      localStorage.setItem("chat_session_id", session_id);
-    }
-
-    function toggleChat(open = null) {
-      const isOpen = chatbox.classList.contains("show");
-
-      if (open === true || (!isOpen && open === null)) {
-        chatbox.classList.add("show");
-        toggleBtn.style.display = "none";
-      } else {
-        chatbox.classList.remove("show");
-        toggleBtn.style.display = "inline-block";
-      }
-    }
-
-    function clearChat() {
-      chatMessages.innerHTML = '';
-      localStorage.removeItem("chat_session_id");
-      session_id = "sess-" + Date.now();
-      localStorage.setItem("chat_session_id", session_id);
-      appendMessage("Η συνομιλία μηδενίστηκε. Ξεκινάμε από την αρχή.", "bot");
+    function sendMessage() {
+      const text = userInput.value.trim();
+      if (text === "") return;
+      appendMessage(text, "user");
+      userInput.value = "";
     }
 
     function appendMessage(content, sender) {
@@ -243,79 +255,40 @@
       message.classList.add("message", sender);
       const bubble = document.createElement("span");
       bubble.innerHTML = content;
-
-      if (sender === "bot") {
-        const avatarWrapper = document.createElement("div");
-        avatarWrapper.style.background = "#fff8dc";
-        avatarWrapper.style.padding = "4px";
-        avatarWrapper.style.borderRadius = "50%";
-        avatarWrapper.style.boxShadow = "0 0 0 2px #fbbf24";
-        avatarWrapper.style.display = "flex";
-        avatarWrapper.style.alignItems = "center";
-        avatarWrapper.style.justifyContent = "center";
-        avatarWrapper.style.flexShrink = "0";
-
-        const avatarImg = document.createElement("img");
-        avatarImg.src = "https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/BOOKY.TELIKO.HQ.png";
-        avatarImg.alt = "bot";
-        avatarImg.style.width = "28px";
-        avatarImg.style.height = "28px";
-        avatarImg.style.borderRadius = "50%";
-
-        avatarWrapper.appendChild(avatarImg);
-        message.appendChild(avatarWrapper);
-      }
-
       message.appendChild(bubble);
       chatMessages.appendChild(message);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    async function sendMessage() {
-      const text = userInput.value.trim();
-      if (text === "") return;
-      appendMessage(text, "user");
-      userInput.value = "";
-
-      const typing = document.createElement("div");
-      typing.classList.add("message", "bot");
-      const typingSpan = document.createElement("span");
-      typingSpan.textContent = "Ο Mr Booky γράφει...";
-      typing.appendChild(typingSpan);
-      chatMessages.appendChild(typing);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-
-      try {
-        const response = await fetch("https://ui-api-for-github-160866660933.europe-west1.run.app/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text, session_id: session_id })
-        });
-
-        typing.remove();
-        const data = await response.json();
-        if (data.reply) appendMessage(data.reply, "bot");
-        else appendMessage("Λάβαμε μη αναμενόμενη απάντηση από τον server.", "bot");
-      } catch (error) {
-        typing.remove();
-        appendMessage("Προέκυψε σφάλμα. Προσπαθήστε ξανά.", "bot");
-      }
+    function clearChat() {
+      chatMessages.innerHTML = '';
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       const closeBtn = document.querySelector(".close-chat-btn");
+
+      toggleBtn.style.display = "inline-block";
+      chatbox.classList.remove("show");
+
+      toggleBtn.addEventListener("click", () => {
+        chatbox.classList.add("show");
+        toggleBtn.style.display = "none";
+      });
+
       if (closeBtn) {
-        closeBtn.addEventListener("click", () => toggleChat(false));
+        closeBtn.addEventListener("click", () => {
+          chatbox.classList.remove("show");
+          toggleBtn.style.display = "inline-block";
+        });
+
         closeBtn.addEventListener("touchstart", (e) => {
           e.preventDefault();
-          toggleChat(false);
+          chatbox.classList.remove("show");
+          toggleBtn.style.display = "inline-block";
         });
       }
-
-      // Σιγουρευόμαστε ότι ξεκινάει κλειστό
-      chatbox.classList.remove("show");
-      toggleBtn.style.display = "inline-block";
     });
   </script>
 </body>
 </html>
+
