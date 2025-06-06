@@ -201,11 +201,15 @@
     </div>
   </div>
 
+  <!-- 🎵 Ήχος απάντησης bot -->
+  <audio id="botSound" src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/wet-431.mp3" preload="auto"></audio>
+
   <script>
     const chatbox = document.getElementById("chatbox");
     const toggleBtn = document.querySelector(".toggle-chatbox");
     const chatMessages = document.getElementById("chat-messages");
     const userInput = document.getElementById("user-input");
+    const botSound = document.getElementById("botSound");
 
     let session_id = localStorage.getItem("chat_session_id");
     if (!session_id) {
@@ -223,6 +227,10 @@
       message.appendChild(bubble);
       chatMessages.appendChild(message);
       chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      if (sender === "bot") {
+        botSound.play().catch(() => {});
+      }
     }
 
     function clearChat() {
