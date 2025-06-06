@@ -35,6 +35,8 @@
       font-size: 1.125rem;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
       transition: all 0.3s ease;
+      z-index: 1001;
+      position: relative;
     }
 
     .toggle-chatbox:hover {
@@ -59,6 +61,7 @@
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center center;
+      z-index: 1000;
     }
 
     .chatbox.show {
@@ -124,12 +127,6 @@
       color: white;
     }
 
-    .message img {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-    }
-
     .input-area {
       padding: 1rem;
       background: rgba(255, 255, 255, 0.95);
@@ -173,26 +170,15 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 0.2; }
-    }
-
     @media (max-width: 768px) {
       .chatbox {
-        position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        max-width: 100%;
-        max-height: 100%;
+        width: 100vw;
+        height: 100vh;
+        max-width: 100vw;
+        max-height: 100vh;
         border-radius: 0;
-        display: flex;
-        flex-direction: column;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
       }
     }
   </style>
@@ -229,24 +215,9 @@
     const chatMessages = document.getElementById("chat-messages");
     const userInput = document.getElementById("user-input");
     const botSound = document.getElementById("botSound");
-    let chatOpened = false;
-
-    let session_id = localStorage.getItem("chat_session_id");
-    if (!session_id) {
-      session_id = "sess-" + Date.now();
-      localStorage.setItem("chat_session_id", session_id);
-    }
 
     function toggleChat() {
-      if (!chatbox.classList.contains("show")) {
-        chatbox.classList.add("show");
-        if (!chatOpened) {
-          appendMessage("Καλώς ήρθατε! Είμαι ο Mr Booky. Πώς μπορώ να σας βοηθήσω;", "bot");
-          chatOpened = true;
-        }
-      } else {
-        chatbox.classList.remove("show");
-      }
+      chatbox.classList.toggle("show");
     }
 
     function clearChat() {
@@ -314,7 +285,6 @@
 
         typing.remove();
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         if (data.reply) appendMessage(data.reply, "bot");
         else appendMessage("Λάβαμε μη αναμενόμενη απάντηση από τον server.", "bot");
@@ -324,24 +294,27 @@
       }
     }
 
-    // ✅ Υποστήριξη click + touchstart για το κουμπί Χ
-    function bindCloseButton() {
+    // Ensure chatbox starts closed
+    document.addEventListener("DOMContentLoaded", () => {
+      chatbox.classList.remove("show");
+
+      // Support for click and touch on close button
       const closeBtn = document.querySelector(".close-chat-btn");
-      if (!closeBtn) return;
+      if (closeBtn) {
+        closeBtn.addEventListener("click", toggleChat);
+        closeBtn.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          toggleChat();
+        });
+      }
+    });
 
-      closeBtn.addEventListener("click", () => {
-        console.log("Κουμπί Χ πατήθηκε");
-        toggleChat();
-      });
-
-      closeBtn.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        console.log("Touch Χ πατήθηκε");
-        toggleChat();
-      });
+    // Unique session ID
+    let session_id = localStorage.getItem("chat_session_id");
+    if (!session_id) {
+      session_id = "sess-" + Date.now();
+      localStorage.setItem("chat_session_id", session_id);
     }
-
-    document.addEventListener("DOMContentLoaded", bindCloseButton);
   </script>
 </body>
 </html>
