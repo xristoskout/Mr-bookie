@@ -7,9 +7,9 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <style>
     html, body {
-      height: 100%;
       margin: 0;
       padding: 0;
+      height: 100%;
     }
 
     body {
@@ -37,11 +37,6 @@
       transition: all 0.3s ease;
       z-index: 1001;
       position: relative;
-    }
-
-    .toggle-chatbox:hover {
-      background: linear-gradient(45deg, #f59e0b, #d97706, #f59e0b);
-      transform: scale(1.05);
     }
 
     .chatbox {
@@ -127,12 +122,6 @@
       color: white;
     }
 
-    .message img {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-    }
-
     .input-area {
       padding: 1rem;
       background: rgba(255, 255, 255, 0.95);
@@ -140,7 +129,6 @@
       border-top: 1px solid #fbbf24;
       display: flex;
       gap: 0.75rem;
-      z-index: 1;
     }
 
     .input-area input {
@@ -164,7 +152,6 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 6px -1px rgba(251, 146, 60, 0.25);
     }
 
     .input-area button:hover {
@@ -179,31 +166,21 @@
 
     @media (max-width: 768px) {
       .chatbox {
-        position: fixed;
-        inset: 0;
+        top: 0;
+        left: 0;
         width: 100vw;
         height: 100dvh;
         border-radius: 0;
         display: flex;
         flex-direction: column;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-      }
-
-      .chatbox.show + .toggle-chatbox {
-        display: none;
-      }
-
-      .input-area {
-        z-index: 1;
+        z-index: 1000;
       }
     }
   </style>
 </head>
 <body>
   <div class="chatbox-wrapper">
-    <button class="toggle-chatbox" onclick="toggleChat()">💬 Mr Booky</button>
+    <button class="toggle-chatbox" onclick="toggleChat(true)">💬 Mr Booky</button>
     <div class="chatbox" id="chatbox">
       <div class="chat-header">
         <div>
@@ -230,18 +207,26 @@
 
   <script>
     const chatbox = document.getElementById("chatbox");
+    const toggleBtn = document.querySelector(".toggle-chatbox");
     const chatMessages = document.getElementById("chat-messages");
     const userInput = document.getElementById("user-input");
     const botSound = document.getElementById("botSound");
-    const toggleBtn = document.querySelector(".toggle-chatbox");
 
-    function toggleChat() {
-      if (chatbox.classList.contains("show")) {
-        chatbox.classList.remove("show");
-        toggleBtn.style.display = "inline-block";
-      } else {
+    let session_id = localStorage.getItem("chat_session_id");
+    if (!session_id) {
+      session_id = "sess-" + Date.now();
+      localStorage.setItem("chat_session_id", session_id);
+    }
+
+    function toggleChat(open = null) {
+      const isOpen = chatbox.classList.contains("show");
+
+      if (open === true || (!isOpen && open === null)) {
         chatbox.classList.add("show");
         toggleBtn.style.display = "none";
+      } else {
+        chatbox.classList.remove("show");
+        toggleBtn.style.display = "inline-block";
       }
     }
 
@@ -318,24 +303,19 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      chatbox.classList.remove("show");
-      toggleBtn.style.display = "inline-block";
-
       const closeBtn = document.querySelector(".close-chat-btn");
       if (closeBtn) {
-        closeBtn.addEventListener("click", toggleChat);
+        closeBtn.addEventListener("click", () => toggleChat(false));
         closeBtn.addEventListener("touchstart", (e) => {
           e.preventDefault();
-          toggleChat();
+          toggleChat(false);
         });
       }
-    });
 
-    let session_id = localStorage.getItem("chat_session_id");
-    if (!session_id) {
-      session_id = "sess-" + Date.now();
-      localStorage.setItem("chat_session_id", session_id);
-    }
+      // Σιγουρευόμαστε ότι ξεκινάει κλειστό
+      chatbox.classList.remove("show");
+      toggleBtn.style.display = "inline-block";
+    });
   </script>
 </body>
 </html>
