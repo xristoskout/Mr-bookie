@@ -220,18 +220,37 @@
     let chatOpened = false;
 
     function appendMessage(content, sender) {
-      const message = document.createElement("div");
-      message.classList.add("message", sender);
-      const bubble = document.createElement("span");
-      bubble.innerHTML = content;
-      message.appendChild(bubble);
-      chatMessages.appendChild(message);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+  const message = document.createElement("div");
+  message.classList.add("message", sender);
 
-      if (sender === "bot") {
-        botSound.play().catch(() => {});
-      }
+  const bubble = document.createElement("span");
+  bubble.innerHTML = content;
+  message.appendChild(bubble);
+  chatMessages.appendChild(message);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  if (sender === "bot") {
+    // Παίζει ήχος
+    botSound.play().catch(() => {});
+
+    // 🔍 Έλεγχος για λέξεις-κλειδιά
+    const text = content.toLowerCase();
+    const keywords = ["τηλέφωνο", "επικοινων", "καλέστε", "τηλεφώνησ"];
+    const found = keywords.some(kw => text.includes(kw));
+
+    if (found) {
+      const phoneBtnWrapper = document.createElement("div");
+      phoneBtnWrapper.classList.add("message", "bot");
+
+      const phoneBtn = document.createElement("span");
+      phoneBtn.innerHTML = `<a href="tel:2610450000" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;text-decoration:none;font-weight:bold;">📞 Κλήση 2610450000</a>`;
+
+      phoneBtnWrapper.appendChild(phoneBtn);
+      chatMessages.appendChild(phoneBtnWrapper);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+  }
+}
 
     function clearChat() {
       chatMessages.innerHTML = '';
