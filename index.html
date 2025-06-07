@@ -219,27 +219,29 @@
 
   let chatOpened = false;
 
-  // ✅ ΝΕΑ: Συνάρτηση για ασφαλή clickable links + QR preview
+  // ✅ autoLinkify με cleanup τελικών σημείων στίξης
   function autoLinkify(text) {
     const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const linkRegex = /((https?:\/\/[^\s]+)|(tel:\+?\d+)|(mailto:[^\s]+)|(www\.[^\s]+))/g;
+    const linkRegex = /((https?:\/\/[^\s<>()]+)|(tel:\+?\d+)|(mailto:[^\s<>()]+)|(www\.[^\s<>()]+))/g;
 
     return safeText.replace(linkRegex, (match) => {
-      let url = match;
+      // Αφαίρεση τελικής τελείας, αν υπάρχει
+      let cleanMatch = match.replace(/[.,?!;]+$/, "");
+      let url = cleanMatch;
       let icon = "🔗";
 
-      if (match.startsWith("www.")) {
-        url = "https://" + match;
+      if (cleanMatch.startsWith("www.")) {
+        url = "https://" + cleanMatch;
         icon = "🌐";
       }
 
-      if (match.startsWith("tel:")) icon = "📞";
-      if (match.startsWith("mailto:")) icon = "📧";
-      if (match.includes("booking.infoxoros.com")) icon = "🧾";
+      if (cleanMatch.startsWith("tel:")) icon = "📞";
+      if (cleanMatch.startsWith("mailto:")) icon = "📧";
+      if (cleanMatch.includes("booking.infoxoros.com")) icon = "🧾";
 
-      let html = `<a href="${url}" target="_blank" style="color:#2563eb;text-decoration:underline;">${icon} ${match}</a>`;
+      let html = `<a href="${url}" target="_blank" style="color:#2563eb;text-decoration:underline;">${icon} ${cleanMatch}</a>`;
 
-      if (match.includes("booking.infoxoros.com")) {
+      if (cleanMatch.includes("booking.infoxoros.com")) {
         html += `<br><img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=100x100" alt="QR Code" style="margin-top:6px;border-radius:8px;" />`;
       }
 
@@ -252,7 +254,7 @@
     message.classList.add("message", sender);
 
     const bubble = document.createElement("span");
-    bubble.innerHTML = autoLinkify(content); // ✅ Χρήση της νέας function
+    bubble.innerHTML = autoLinkify(content); // ✅ εδώ έγινε η αντικατάσταση
     message.appendChild(bubble);
     chatMessages.appendChild(message);
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -261,7 +263,7 @@
       botSound.play().catch(() => {});
 
       const text = content.toLowerCase();
-      const keywords = ["τηλέφωνο", "επικοινων", "καλέστε","επικοινωνία","επαφή","telephone","telefoon","telefon","telefono","téléphone","teléfono", "kommunikation","kλήση","oproep", "appel","call","chamada","phone","τηλεφώνησ"];
+      const keywords = ["τηλέφωνο", "επικοινων", "καλέστε", "επικοινωνία", "επαφή", "telephone", "telefoon", "telefon", "telefono", "téléphone", "teléfono", "kommunikation", "kλήση", "oproep", "appel", "call", "chamada", "phone", "τηλεφώνησ"];
       const found = keywords.some(kw => text.includes(kw));
 
       if (found) {
