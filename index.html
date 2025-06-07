@@ -220,11 +220,13 @@
   let chatOpened = false;
 
   // ✅ autoLinkify με cleanup τελικών σημείων στίξης
-  function autoLinkify(text) {
+ function autoLinkify(text) {
   const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const linkRegex = /((https?:\/\/[^\s<>()]+)|(tel:\+?\d+)|(mailto:([^\s<>()]+))|(www\.[^\s<>()]+))/g;
 
-  return safeText.replace(linkRegex, (match, p1, p2, p3, p4, mailTarget) => {
+  // Match: urls, tel, mailto, www, emails
+  const linkRegex = /((https?:\/\/[^\s<>()]+)|(tel:\+?\d+)|(mailto:([^\s<>()]+))|(www\.[^\s<>()]+)|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}))/g;
+
+  return safeText.replace(linkRegex, (match, p1, p2, p3, p4, mailTarget, p6, emailOnly) => {
     let cleanMatch = match.replace(/[.,?!;]+$/, "");
     let url = cleanMatch;
     let label = cleanMatch;
@@ -242,7 +244,13 @@
 
     if (cleanMatch.startsWith("mailto:")) {
       icon = "📧";
-      label = cleanMatch.replace("mailto:", ""); // ✅ Εμφανίζει μόνο το email
+      label = cleanMatch.replace("mailto:", "");
+    }
+
+    if (emailOnly) {
+      icon = "📧";
+      url = "mailto:" + emailOnly;
+      label = emailOnly;
     }
 
     if (cleanMatch.includes("booking.infoxoros.com")) {
@@ -258,7 +266,6 @@
     return html;
   });
 }
-
 
   function appendMessage(content, sender) {
     const message = document.createElement("div");
