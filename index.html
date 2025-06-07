@@ -221,33 +221,44 @@
 
   // ✅ autoLinkify με cleanup τελικών σημείων στίξης
   function autoLinkify(text) {
-    const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const linkRegex = /((https?:\/\/[^\s<>()]+)|(tel:\+?\d+)|(mailto:[^\s<>()]+)|(www\.[^\s<>()]+))/g;
+  const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const linkRegex = /((https?:\/\/[^\s<>()]+)|(tel:\+?\d+)|(mailto:([^\s<>()]+))|(www\.[^\s<>()]+))/g;
 
-    return safeText.replace(linkRegex, (match) => {
-      // Αφαίρεση τελικής τελείας, αν υπάρχει
-      let cleanMatch = match.replace(/[.,?!;]+$/, "");
-      let url = cleanMatch;
-      let icon = "🔗";
+  return safeText.replace(linkRegex, (match, p1, p2, p3, p4, mailTarget) => {
+    let cleanMatch = match.replace(/[.,?!;]+$/, "");
+    let url = cleanMatch;
+    let label = cleanMatch;
+    let icon = "🔗";
 
-      if (cleanMatch.startsWith("www.")) {
-        url = "https://" + cleanMatch;
-        icon = "🌐";
-      }
+    if (cleanMatch.startsWith("www.")) {
+      url = "https://" + cleanMatch;
+      icon = "🌐";
+    }
 
-      if (cleanMatch.startsWith("tel:")) icon = "📞";
-      if (cleanMatch.startsWith("mailto:")) icon = "📧";
-      if (cleanMatch.includes("booking.infoxoros.com")) icon = "🧾";
+    if (cleanMatch.startsWith("tel:")) {
+      icon = "📞";
+      label = cleanMatch.replace("tel:", "");
+    }
 
-      let html = `<a href="${url}" target="_blank" style="color:#2563eb;text-decoration:underline;">${icon} ${cleanMatch}</a>`;
+    if (cleanMatch.startsWith("mailto:")) {
+      icon = "📧";
+      label = cleanMatch.replace("mailto:", ""); // ✅ Εμφανίζει μόνο το email
+    }
 
-      if (cleanMatch.includes("booking.infoxoros.com")) {
-        html += `<br><img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=100x100" alt="QR Code" style="margin-top:6px;border-radius:8px;" />`;
-      }
+    if (cleanMatch.includes("booking.infoxoros.com")) {
+      icon = "🧾";
+    }
 
-      return html;
-    });
-  }
+    let html = `<a href="${url}" target="_blank" style="color:#2563eb;text-decoration:underline;">${icon} ${label}</a>`;
+
+    if (cleanMatch.includes("booking.infoxoros.com")) {
+      html += `<br><img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=100x100" alt="QR Code" style="margin-top:6px;border-radius:8px;" />`;
+    }
+
+    return html;
+  });
+}
+
 
   function appendMessage(content, sender) {
     const message = document.createElement("div");
