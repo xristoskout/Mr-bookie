@@ -288,8 +288,16 @@
         const phoneBtnWrapper = document.createElement("div");
         phoneBtnWrapper.classList.add("message", "bot");
 
-        const phoneBtn = document.createElement("span");
-        phoneBtn.innerHTML = `<a href="tel:2610450000" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;text-decoration:none;font-weight:bold;">📞 Κλήση 2610450000</a>`;
+      let callLabel = "Κλήση";
+      if (text.includes("call") || text.includes("telephone") || text.includes("phone")) callLabel = "Call";
+      else if (text.includes("llamar")) callLabel = "Llamar";
+      else if (text.includes("chiama")) callLabel = "Chiama";
+      else if (text.includes("appeler")) callLabel = "Appeler";
+      else if (text.includes("anrufen")) callLabel = "Anrufen";
+      else if (text.includes("bellen")) callLabel = "Bellen";
+
+      const phoneBtn = document.createElement("span");
+      phoneBtn.innerHTML = `<a href="tel:2610450000" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;text-decoration:none;font-weight:bold;">📞 ${callLabel} 2610450000</a>`;
 
         phoneBtnWrapper.appendChild(phoneBtn);
         chatMessages.appendChild(phoneBtnWrapper);
