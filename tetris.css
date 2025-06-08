@@ -1,0 +1,19 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0; /* Same as canvas background for consistency */
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    color: #333;
+}
+
+canvas {
+    border: 2px solid #333; /* Make border more prominent */
+    background-color: #e0e0e0; /* Slightly different background for canvas if needed */
+}
