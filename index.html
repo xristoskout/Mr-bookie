@@ -2,10 +2,14 @@
 <html lang="el">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Mr Booky</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     html, body {
       height: 100%;
       margin: 0;
@@ -43,8 +47,8 @@
       position: fixed;
       bottom: 6rem;
       right: 1.5rem;
-      width: 420px;
-      height: 750px;
+      width: min(420px, 90vw);
+      height: min(750px, 90svh);
       max-width: calc(100vw - 3rem);
       max-height: calc(100vh - 7.5rem);
       border-radius: 1.5rem;
@@ -167,9 +171,9 @@
         top: 0;
         left: 0;
         width: 100vw;
-        height: 100dvh;
+        height: 100svh;
         max-width: 100vw;
-        max-height: 100dvh;
+        max-height: 100svh;
         border-radius: 0;
         flex-direction: column;
         z-index: 1000;
