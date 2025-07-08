@@ -1,128 +1,188 @@
 (() => {
+  // 💡 Εισαγωγή Material Icons
+  const link = document.createElement("link");
+  link.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
+  link.rel = "stylesheet";
+  document.head.appendChild(link);
+
+  // 🎨 CSS από το index.html
   const style = document.createElement("style");
   style.textContent = `
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
     .chatbox-wrapper {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      bottom: 1.5rem;
+      right: 1.5rem;
       z-index: 1000;
     }
+
     .toggle-chatbox {
-      background: #ffdf43;
+      background: linear-gradient(45deg, #fbbf24, #eab308, #fbbf24);
+      color: #1f2937;
+      font-weight: bold;
+      padding: 1rem 1.5rem;
+      border-radius: 1rem;
       border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
       cursor: pointer;
-      font-weight: bold;
-    }
-    .chatbox {
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      flex-direction: column;
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      overflow: hidden;
-      height: 550px;
-      width: 400px;
-      max-width: calc(100vw - 40px);
-      background: #fff8f0 url('https://github.com/xristoskout/Mr-bookie/blob/main/Ms%20Booky%20366x567.png?raw=true') no-repeat center center / cover;
-      display: none;
+      font-size: 1.125rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
       transition: all 0.3s ease;
-    }
-    .chatbox.show {
-      display: flex;
-    }
-    .chat-header {
-      background: #ffdf43;
-      padding: 10px;
-      text-align: left;
-      font-weight: bold;
-      font-size: 1.2em;
+      z-index: 1001;
       position: relative;
     }
-    .dark-toggle, .close-chatbox, .clear-chat {
-      position: absolute;
-      top: 10px;
-      cursor: pointer;
-      font-weight: bold;
+
+    .chatbox {
+      position: fixed;
+      bottom: 6rem;
+      right: 1.5rem;
+      width: min(420px, 90vw);
+      height: min(750px, 90svh);
+      max-width: calc(100vw - 3rem);
+      max-height: calc(100vh - 7.5rem);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      display: none;
+      background-color: white;
+      background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/Ms%20Booky%20366x567.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      z-index: 1000;
+      flex-direction: column;
     }
-    .dark-toggle { right: 75px; }
-    .clear-chat { right: 45px; }
-    .close-chatbox { right: 10px; }
+
+    .chatbox.show { display: flex; }
+
+    .chat-header {
+      background: linear-gradient(45deg, #fbbf24, #eab308, #fbbf24);
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 1.25rem;
+      color: #1f2937;
+    }
+
     .chat-messages {
       flex: 1;
-      padding: 10px;
+      padding: 1rem;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 0.75rem;
     }
+
     .message {
-      max-width: 90%;
-      padding: 10px 14px;
-      border-radius: 15px;
-      word-wrap: break-word;
       display: flex;
       align-items: flex-start;
-      gap: 10px;
+      gap: 0.5rem;
+      max-width: 85%;
     }
-    .bot {
-      background: #ffdf43;
-      align-self: flex-start;
+
+    .message.bot { flex-direction: row; align-self: flex-start; }
+    .message.user { flex-direction: row-reverse; align-self: flex-end; }
+
+    .message span {
+      display: inline-block;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.4;
     }
-    .user {
-      background: #f3a45b;
-      align-self: flex-end;
+
+    .message.bot span {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #1f2937;
+      border: 1px solid #fbbf24;
     }
-    .bot img {
+
+    .message.user span {
+      background: linear-gradient(135deg, #fb923c, #f59e0b);
+      color: white;
+    }
+
+    .message img {
       width: 28px;
       height: 28px;
       border-radius: 50%;
     }
+
     .input-area {
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid #fbbf24;
       display: flex;
-      padding: 10px;
-      border-top: 1px solid #ccc;
-      align-items: flex-end;
-      gap: 8px;
+      gap: 0.75rem;
     }
+
     .input-area input {
       flex: 1;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 1em;
-      height: 2.5em;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 1rem;
+      outline: none;
+      color: #1f2937;
     }
+
     .input-area button {
-      background: #f3a45b;
+      width: 3rem;
+      height: 3rem;
+      background: linear-gradient(135deg, #fb923c, #f59e0b);
       border: none;
-      border-radius: 50%;
-      width: 4.5em;
-      height: 4.5em;
+      border-radius: 1rem;
+      color: white;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .input-area button:hover {
+      background: linear-gradient(135deg, #ea580c, #d97706);
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      .chatbox {
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100svh;
+        max-width: 100vw;
+        max-height: 100svh;
+        border-radius: 0;
+        flex-direction: column;
+        z-index: 1000;
+      }
     }
   `;
   document.head.appendChild(style);
 
   const html = `
     <div class="chatbox-wrapper">
-      <button class="toggle-chatbox" onclick="toggleChat()">💬 Mr Booky</button>
+      <button class="toggle-chatbox">💬 Mr Booky</button>
       <div class="chatbox" id="chatbox">
         <div class="chat-header">
-          Mr Booky
-          <span class="dark-toggle" onclick="toggleDark()">🌓</span>
-          <span class="clear-chat" onclick="clearChat()">🗑</span>
-          <span class="close-chatbox" onclick="toggleChat()">✖</span>
+          <div>
+            <strong>Mr Booky</strong><br/>
+            <span style="font-size: 0.65rem; font-weight: normal;">Powered by Taxi Express Patras</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
+            <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor: pointer;">close</span>
+            <span class="material-icons" onclick="clearChat()" title="Καθαρισμός" style="cursor: pointer;">delete_sweep</span>
+          </div>
         </div>
         <div class="chat-messages" id="chat-messages"></div>
         <div class="input-area">
           <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." onkeydown="if(event.key === 'Enter') sendMessage()" />
-          <button onclick="sendMessage()" title="Αποστολή">📤</button>
+          <button onclick="sendMessage()" title="Αποστολή">
+            <span class="material-icons">send</span>
+          </button>
         </div>
       </div>
     </div>
@@ -131,60 +191,91 @@
   document.body.insertAdjacentHTML("beforeend", html);
 
   const chatbox = document.getElementById("chatbox");
+  const toggleBtn = document.querySelector(".toggle-chatbox");
   const chatMessages = document.getElementById("chat-messages");
   const userInput = document.getElementById("user-input");
   const botSound = document.getElementById("botSound");
   let chatOpened = false;
-  let session_id = localStorage.getItem("chat_session_id") || ("sess-" + Date.now());
-  localStorage.setItem("chat_session_id", session_id);
 
-  window.toggleChat = () => {
-    if (!chatbox.classList.contains("show")) {
-      chatbox.classList.add("show");
-      if (!chatOpened) {
-        appendMessage("Καλώς ήρθατε! Είμαι ο Mr Booky. Πώς μπορώ να σας βοηθήσω;", "bot");
-        chatOpened = true;
-      }
-    } else {
-      chatbox.classList.remove("show");
-    }
-  };
-
-  window.toggleDark = () => {
-    document.body.classList.toggle("dark");
-  };
-
-  window.clearChat = () => {
-    chatMessages.innerHTML = '';
-    localStorage.removeItem("chat_session_id");
+  let session_id = localStorage.getItem("chat_session_id");
+  if (!session_id) {
     session_id = "sess-" + Date.now();
     localStorage.setItem("chat_session_id", session_id);
-    appendMessage("Η συνομιλία μηδενίστηκε. Ξεκινάμε από την αρχή.", "bot");
-  };
+  }
+
+  function autoLinkify(text) {
+    const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const linkRegex = /((https?:\/\/[^\s<>()]+)|(tel:\+?\d+)|(mailto:([^\s<>()]+))|(www\.[^\s<>()]+)|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}))/g;
+    return safeText.replace(linkRegex, (match, p1, p2, p3, p4, mailTarget, p6, emailOnly) => {
+      let cleanMatch = match.replace(/[.,?!;]+$/, "");
+      let url = cleanMatch;
+      let label = cleanMatch;
+      let icon = "🔗";
+      if (cleanMatch.startsWith("www.")) {
+        url = "https://" + cleanMatch;
+        icon = "🌐";
+      }
+      if (cleanMatch.startsWith("tel:")) {
+        icon = "📞";
+        label = cleanMatch.replace("tel:", "");
+      }
+      if (cleanMatch.startsWith("mailto:")) {
+        icon = "📧";
+        label = cleanMatch.replace("mailto:", "");
+      }
+      if (emailOnly) {
+        icon = "📧";
+        url = "mailto:" + emailOnly;
+        label = emailOnly;
+      }
+      if (cleanMatch.includes("booking.infoxoros.com")) {
+        icon = "🧾";
+      }
+      let html = `<a href="${url}" target="_blank" style="color:#2563eb;text-decoration:underline;">${icon} ${label}</a>`;
+      if (cleanMatch.includes("booking.infoxoros.com")) {
+        html += `<br><img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=100x100" alt="QR Code" style="margin-top:6px;border-radius:8px;" />`;
+      }
+      return html;
+    });
+  }
 
   function appendMessage(content, sender) {
     const message = document.createElement("div");
     message.classList.add("message", sender);
-    if (sender === "bot") {
-      const linkedText = content.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
-      message.innerHTML = '<img src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/BOOKY.TELIKO.HQ.png" alt="bot" />' + '<span>' + linkedText + '</span>';
-      botSound.play().catch(() => {});
-    } else {
-      message.textContent = content;
-    }
+    const bubble = document.createElement("span");
+    bubble.innerHTML = autoLinkify(content);
+    message.appendChild(bubble);
     chatMessages.appendChild(message);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    if (sender === "bot") {
+      botSound.play().catch(() => {});
+      const text = content.toLowerCase();
+      const keywords = ["τηλέφωνο", "επικοινων", "καλέστε", "επικοινωνία", "επαφή", "telephone", "telefoon", "telefon", "telefono", "téléphone", "teléfono", "kommunikation", "kλήση", "oproep", "appel", "call", "chamada", "phone", "τηλεφώνησ"];
+      const found = keywords.some(kw => text.includes(kw));
+      if (found) {
+        const phoneBtnWrapper = document.createElement("div");
+        phoneBtnWrapper.classList.add("message", "bot");
+        const phoneBtn = document.createElement("span");
+        phoneBtn.innerHTML = `<a href="tel:2610450000" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;text-decoration:none;font-weight:bold;">📞 Κλήση 2610450000</a>`;
+        phoneBtnWrapper.appendChild(phoneBtn);
+        chatMessages.appendChild(phoneBtnWrapper);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    }
   }
 
-  window.sendMessage = async () => {
+  async function sendMessage() {
     const text = userInput.value.trim();
     if (!text) return;
     appendMessage(text, "user");
     userInput.value = "";
 
     const typing = document.createElement("div");
-    typing.classList.add("message", "bot", "typing");
-    typing.textContent = "Ο Mr Booky γράφει...";
+    typing.classList.add("message", "bot");
+    const typingSpan = document.createElement("span");
+    typingSpan.textContent = "Ο Mr Booky γράφει...";
+    typing.appendChild(typingSpan);
     chatMessages.appendChild(typing);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -194,12 +285,42 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, session_id })
       });
-      const data = await res.json();
       typing.remove();
+      const data = await res.json();
       appendMessage(data.reply || "Λάβαμε μη αναμενόμενη απάντηση από τον server.", "bot");
     } catch (e) {
       typing.remove();
       appendMessage("Προέκυψε σφάλμα. Προσπαθήστε ξανά.", "bot");
     }
-  };
+  }
+
+  function clearChat() {
+    chatMessages.innerHTML = '';
+    localStorage.removeItem("chat_session_id");
+    session_id = "sess-" + Date.now();
+    localStorage.setItem("chat_session_id", session_id);
+    appendMessage("Η συνομιλία μηδενίστηκε. Ξεκινάμε από την αρχή.", "bot");
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const closeBtn = document.querySelector(".close-chat-btn");
+    toggleBtn.style.display = "inline-block";
+    chatbox.classList.remove("show");
+
+    toggleBtn.addEventListener("click", () => {
+      chatbox.classList.add("show");
+      toggleBtn.style.display = "none";
+      if (!chatOpened) {
+        appendMessage("Καλώς ήρθατε! Είμαι ο Mr Booky. Πώς μπορώ να σας βοηθήσω;", "bot");
+        chatOpened = true;
+      }
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        chatbox.classList.remove("show");
+        toggleBtn.style.display = "inline-block";
+      });
+    }
+  });
 })();
