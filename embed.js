@@ -1,23 +1,25 @@
 (() => {
-  // 💡 Εισαγωγή Material Icons
+  // 💡 Material Icons
   const link = document.createElement("link");
   link.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
   link.rel = "stylesheet";
   document.head.appendChild(link);
 
-  // 🎨 CSS από το index.html
+  // 🎨 CSS styling
   const style = document.createElement("style");
   style.textContent = `
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; }
-
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #fef7ed, #fef3c7, #fed7aa);
+    }
     .chatbox-wrapper {
       position: fixed;
       bottom: 1.5rem;
       right: 1.5rem;
       z-index: 1000;
     }
-
     .toggle-chatbox {
       background: linear-gradient(45deg, #fbbf24, #eab308, #fbbf24);
       color: #1f2937;
@@ -32,7 +34,6 @@
       z-index: 1001;
       position: relative;
     }
-
     .chatbox {
       position: fixed;
       bottom: 6rem;
@@ -52,9 +53,7 @@
       z-index: 1000;
       flex-direction: column;
     }
-
     .chatbox.show { display: flex; }
-
     .chat-header {
       background: linear-gradient(45deg, #fbbf24, #eab308, #fbbf24);
       padding: 1.25rem;
@@ -65,7 +64,6 @@
       font-size: 1.25rem;
       color: #1f2937;
     }
-
     .chat-messages {
       flex: 1;
       padding: 1rem;
@@ -74,17 +72,14 @@
       flex-direction: column;
       gap: 0.75rem;
     }
-
     .message {
       display: flex;
       align-items: flex-start;
       gap: 0.5rem;
       max-width: 85%;
     }
-
     .message.bot { flex-direction: row; align-self: flex-start; }
     .message.user { flex-direction: row-reverse; align-self: flex-end; }
-
     .message span {
       display: inline-block;
       padding: 0.75rem 1rem;
@@ -92,24 +87,20 @@
       font-size: 0.95rem;
       line-height: 1.4;
     }
-
     .message.bot span {
       background: linear-gradient(135deg, #fef3c7, #fde68a);
       color: #1f2937;
       border: 1px solid #fbbf24;
     }
-
     .message.user span {
       background: linear-gradient(135deg, #fb923c, #f59e0b);
       color: white;
     }
-
     .message img {
       width: 28px;
       height: 28px;
       border-radius: 50%;
     }
-
     .input-area {
       padding: 1rem;
       background: rgba(255, 255, 255, 0.95);
@@ -118,7 +109,6 @@
       display: flex;
       gap: 0.75rem;
     }
-
     .input-area input {
       flex: 1;
       padding: 0.75rem 1rem;
@@ -127,7 +117,6 @@
       outline: none;
       color: #1f2937;
     }
-
     .input-area button {
       width: 3rem;
       height: 3rem;
@@ -141,12 +130,10 @@
       justify-content: center;
       transition: all 0.2s ease;
     }
-
     .input-area button:hover {
       background: linear-gradient(135deg, #ea580c, #d97706);
       transform: scale(1.05);
     }
-
     @media (max-width: 768px) {
       .chatbox {
         top: 0;
@@ -174,13 +161,13 @@
           </div>
           <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
             <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor: pointer;">close</span>
-            <span class="material-icons" onclick="clearChat()" title="Καθαρισμός" style="cursor: pointer;">delete_sweep</span>
+            <span class="material-icons clear-chat" title="Καθαρισμός" style="cursor: pointer;">delete_sweep</span>
           </div>
         </div>
         <div class="chat-messages" id="chat-messages"></div>
         <div class="input-area">
-          <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." onkeydown="if(event.key === 'Enter') sendMessage()" />
-          <button onclick="sendMessage()" title="Αποστολή">
+          <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." />
+          <button id="send-btn" title="Αποστολή">
             <span class="material-icons">send</span>
           </button>
         </div>
@@ -191,17 +178,17 @@
   document.body.insertAdjacentHTML("beforeend", html);
 
   const chatbox = document.getElementById("chatbox");
-  const toggleBtn = document.querySelector(".toggle-chatbox");
   const chatMessages = document.getElementById("chat-messages");
   const userInput = document.getElementById("user-input");
   const botSound = document.getElementById("botSound");
-  let chatOpened = false;
+  const toggleBtn = document.querySelector(".toggle-chatbox");
+  const closeBtn = document.querySelector(".close-chat-btn");
+  const clearBtn = document.querySelector(".clear-chat");
+  const sendBtn = document.getElementById("send-btn");
 
-  let session_id = localStorage.getItem("chat_session_id");
-  if (!session_id) {
-    session_id = "sess-" + Date.now();
-    localStorage.setItem("chat_session_id", session_id);
-  }
+  let chatOpened = false;
+  let session_id = localStorage.getItem("chat_session_id") || ("sess-" + Date.now());
+  localStorage.setItem("chat_session_id", session_id);
 
   function autoLinkify(text) {
     const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -302,25 +289,31 @@
     appendMessage("Η συνομιλία μηδενίστηκε. Ξεκινάμε από την αρχή.", "bot");
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const closeBtn = document.querySelector(".close-chat-btn");
-    toggleBtn.style.display = "inline-block";
-    chatbox.classList.remove("show");
-
-    toggleBtn.addEventListener("click", () => {
+  function toggleChat() {
+    if (!chatbox.classList.contains("show")) {
       chatbox.classList.add("show");
       toggleBtn.style.display = "none";
       if (!chatOpened) {
         appendMessage("Καλώς ήρθατε! Είμαι ο Mr Booky. Πώς μπορώ να σας βοηθήσω;", "bot");
         chatOpened = true;
       }
-    });
-
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        chatbox.classList.remove("show");
-        toggleBtn.style.display = "inline-block";
-      });
+    } else {
+      chatbox.classList.remove("show");
+      toggleBtn.style.display = "inline-block";
     }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    toggleBtn.addEventListener("click", toggleChat);
+    closeBtn?.addEventListener("click", toggleChat);
+    clearBtn?.addEventListener("click", clearChat);
+    sendBtn?.addEventListener("click", sendMessage);
+    userInput?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
   });
+
+  // ✅ Κάνει τις συναρτήσεις global για να λειτουργούν τα onclick στο HTML
+  window.sendMessage = sendMessage;
+  window.clearChat = clearChat;
 })();
