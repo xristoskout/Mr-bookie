@@ -17,7 +17,7 @@
     .chatbox-wrapper {
       position: fixed;
       bottom: 1.5rem;
-      right: 1.5rem;
+      right: 5.5rem;
       z-index: 1000;
     }
     .toggle-chatbox {
@@ -37,7 +37,7 @@
     .chatbox {
       position: fixed;
       bottom: 6rem;
-      right: 1.5rem;
+      right: 5.5rem;
       width: min(420px, 90vw);
       height: min(750px, 90svh);
       max-width: calc(100vw - 3rem);
