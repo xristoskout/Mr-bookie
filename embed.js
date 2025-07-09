@@ -5,34 +5,69 @@
   link.rel = "stylesheet";
   document.head.appendChild(link);
 
-  // 🎨 CSS styling
-  const style = document.createElement("style");
-  style.textContent = `
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #fefefe, #fefefe, #fefefe);
-    }
-    .chatbox-wrapper {
-      position: fixed;
-      bottom: 5.5rem;
-      left: 1.5rem;
-      z-index: 1000;
-    }
-    .toggle-chatbox {
-      background: linear-gradient(45deg, #d7200d, #eb7516, #fbbf24);
-      color: #1f2937;
-      font-weight: bold;
-      padding: 1rem 1.5rem;
-      border-radius: 1rem;
-      border: none;
-      cursor: pointer;
-      font-size: 1.125rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      transition: all 0.3s ease;
-      z-index: 1001;
-      position: relative;
+ // 🎨 CSS styling
+const style = document.createElement("style");
+style.textContent = `
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #fefefe, #fefefe, #fefefe);
+  }
+  .chatbox-wrapper {
+    position: fixed;
+    bottom: 5.5rem;
+    left: 1.5rem;
+    z-index: 1000;
+  }
+
+  .toggle-chatbox {
+    background: linear-gradient(45deg, #d7200d, #eb7516, #fbbf24);
+    color: #1f2937;
+    font-weight: bold;
+    border-radius: 50%; /* 👈 Κυκλικό */
+    border: none;
+    cursor: pointer;
+    font-size: 1.125rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    z-index: 1001;
+    position: relative;
+    width: 120px;  /* 👈 Ίδιο πλάτος/ύψος */
+    height: 120px;
+    overflow: hidden;
+  }
+
+  .toggle-chatbox span {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    transform: rotate(0deg);
+  }
+
+  .circle-text {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #1f2937;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  .circle-text svg {
+    transform: rotate(-90deg);
+  }
+
+  .circle-text text {
+    fill: #1f2937;
+    letter-spacing: 2px;
+    
     }
     .chatbox {
       position: fixed;
