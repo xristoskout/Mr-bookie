@@ -12,7 +12,7 @@
     html, body { height: 100%; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #fef7ed, #fef3c7, #fed7aa);
+      background: linear-gradient(135deg, #fefefe, #fefefe, #fefefe);
     }
     .chatbox-wrapper {
       position: fixed;
@@ -21,7 +21,7 @@
       z-index: 1000;
     }
     .toggle-chatbox {
-      background: linear-gradient(45deg, #fbbf24, #eab308, #fbbf24);
+      background: linear-gradient(45deg, #d7200d, #eb7516, #fbbf24);
       color: #1f2937;
       font-weight: bold;
       padding: 1rem 1.5rem;
