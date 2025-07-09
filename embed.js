@@ -16,8 +16,8 @@
     }
     .chatbox-wrapper {
       position: fixed;
-      bottom: 6.5rem;
-      left: 2.5rem;
+      bottom: 5.5rem;
+      left: 1.5rem;
       z-index: 1000;
     }
     .toggle-chatbox {
