@@ -17,7 +17,7 @@ style.textContent = `
   .chatbox-wrapper {
     position: fixed;
     bottom: 5.5rem;
-    left: 1.5rem;
+    left: 0; /* 👈 Απόλυτα αριστερά */
     z-index: 1000;
   }
 
@@ -33,8 +33,8 @@ style.textContent = `
     transition: all 0.3s ease;
     z-index: 1001;
     position: relative;
-    width: 100px;  /* 👈 Ίδιο πλάτος/ύψος */
-    height: 100px;
+    width: 90px;  /* 👈 Ίδιο πλάτος/ύψος */
+    height: 90px;
     overflow: hidden;
   }
 
