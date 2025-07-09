@@ -28,13 +28,13 @@ style.textContent = `
     border-radius: 50%; /* 👈 Κυκλικό */
     border: none;
     cursor: pointer;
-    font-size: 1.125rem;
+    font-size: 1.325rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     transition: all 0.3s ease;
     z-index: 1001;
     position: relative;
-    width: 120px;  /* 👈 Ίδιο πλάτος/ύψος */
-    height: 120px;
+    width: 100px;  /* 👈 Ίδιο πλάτος/ύψος */
+    height: 100px;
     overflow: hidden;
   }
 
