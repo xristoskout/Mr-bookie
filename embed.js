@@ -21,52 +21,31 @@ style.textContent = `
     z-index: 1000;
   }
 
-  .toggle-chatbox {
-    background: linear-gradient(45deg, #d7200d, #eb7516, #fbbf24);
-    color: #1f2937;
-    font-weight: bold;
-    border-radius: 50%; /* 👈 Κυκλικό */
-    border: none;
-    cursor: pointer;
-    font-size: 1.325rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease;
-    z-index: 1001;
-    position: relative;
-    width: 90px;  /* 👈 Ίδιο πλάτος/ύψος */
-    height: 90px;
-    overflow: hidden;
-  }
+ .toggle-chatbox {
+  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+  width: 90px;
+  height: 90px;
+  position: relative;
+  z-index: 1001;
+}
 
-  .toggle-chatbox span {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    transform: rotate(0deg);
-  }
+/* Προαιρετικό pulse animation στο hover */
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-  .circle-text {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #1f2937;
-    text-transform: uppercase;
-    pointer-events: none;
-  }
+.toggle-chatbox:hover {
+  animation: rotate 1s linear infinite;
 
-  .circle-text svg {
-    transform: rotate(-90deg);
-  }
-
-  .circle-text text {
-    fill: #1f2937;
-    letter-spacing: 2px;
     
     }
     .chatbox {
@@ -187,7 +166,7 @@ style.textContent = `
 
   const html = `
     <div class="chatbox-wrapper">
-      <button class="toggle-chatbox">💬 Mr Booky</button>
+      <button class="toggle-chatbox" aria-label="Άνοιγμα συνομιλίας"></button>
       <div class="chatbox" id="chatbox">
         <div class="chat-header">
           <div>
