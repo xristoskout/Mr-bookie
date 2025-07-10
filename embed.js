@@ -22,37 +22,40 @@ style.textContent = `
   }
 
  .toggle-chatbox {
-  all: unset;
+  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
   width: 90px;
-  height: 90px;
+  height:90px;
   border-radius: 50%;
-  overflow: hidden;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   z-index: 1001;
   transition: transform 0.3s ease;
+  display: inline-block;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.toggle-chatbox img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: 50%;
-  transition: transform 0.3s ease;
+/* Χωρίς εσωτερικό περιεχόμενο, οπότε δεν υπάρχει εικόνα προς long-press */
+.toggle-chatbox::after {
+  content: '';
+  display: none;
 }
 
-/* BONUS: hover animation - bounce */
+/* Optional: bounce animation */
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.50); }
 }
 
-.toggle-chatbox:hover img {
-  animation: bounce 0.6s ease-in-out infinite;
+.toggle-chatbox:hover {
+  animation: bounce 0.5s ease-in-out infinite;
 
 
     
@@ -175,9 +178,7 @@ style.textContent = `
 
   const html = `
     <div class="chatbox-wrapper">
-      <button class="toggle-chatbox" aria-label="Άνοιγμα συνομιλίας">
-      <img src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png" alt="Mr Booky" />
-      </button>
+      <button class="toggle-chatbox" aria-label="Άνοιγμα συνομιλίας"></button>
       <div class="chatbox" id="chatbox">
         <div class="chat-header">
           <div>
