@@ -74,12 +74,12 @@
       transform: translateX(-50%);
       background: #111;
       color: #fff;
-      padding: 6px 12px;
+      padding: 6px 18px;
       font-size: 0.75rem;
       border-radius: 0.5rem;
       opacity: 0;
       pointer-events: none;
-      transition: all 0.3s ease;
+      transition: all 0.8s ease;
       white-space: nowrap;
       z-index: 1002;
     }
