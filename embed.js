@@ -48,6 +48,26 @@
       border: 0 !important;
     }
 
+/* Πλήρης καταστολή overlay και highlight, σε desktop & mobile */
+.toggle-chatbox:focus,
+.toggle-chatbox:active,
+.toggle-chatbox:focus-visible {
+  /* Αποφυγή browser-generated background/overlay */
+  background-color: transparent !important;
+  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png') !important;
+  
+  /* Αποτροπή blend-color overlays */
+  background-blend-mode: normal !important;
+  -webkit-background-clip: padding-box !important;
+  -webkit-text-fill-color: unset !important;
+}
+
+/* Ειδικά για Chrome & Chromium-based */
+.toggle-chatbox {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
     @keyframes bounce {
       0%,100% { transform: scale(1); }
       50% { transform: scale(1.15); }
