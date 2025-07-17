@@ -22,24 +22,20 @@ style.textContent = `
   }
 
 .toggle-chatbox {
-  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png'); /* ή το δικό σου URL */
+  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
   border: none;
   padding: 0;
   margin: 0;
   outline: none;
-
   width: 100px;
   height: 100px;
   border-radius: 50%;
-
   cursor: pointer;
-  box-shadow: none;          /* ❌ Αφαιρούμε εντελώς */
-  background-color: transparent; /* ✅ Τέλος στο μπλε */
-
+  box-shadow: none;
+  background-color: transparent;
   z-index: 1001;
   transition: transform 0.3s ease;
   display: inline-block;
@@ -47,7 +43,12 @@ style.textContent = `
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Optional animation */
+.toggle-chatbox:focus,
+.toggle-chatbox:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
 @keyframes bounce {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.50); }
@@ -55,8 +56,6 @@ style.textContent = `
 
 .toggle-chatbox:hover {
   animation: bounce 0.5s ease-in-out infinite;
-
-
     
     }
     .chatbox {
