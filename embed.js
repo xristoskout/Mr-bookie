@@ -5,11 +5,11 @@
   link.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
   document.head.appendChild(link);
 
-  // 🎨 CSS styling + glow ripple + tooltip
+  // 🎨 CSS styling + continuous animation + glow ripple + tooltip + no blue outline
   const style = document.createElement("style");
   style.textContent = `
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; padding: 0; }
+    html, body { margin: 0; padding: 0; height: 100%; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
     .chatbox-wrapper {
@@ -23,12 +23,9 @@
       background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png');
       background-size: cover;
       background-position: center;
-      background-repeat: no-repeat;
       width: 100px;
       height: 100px;
-      border: none;
-      margin: 0;
-      padding: 0;
+      border: none; margin: 0; padding: 0;
       border-radius: 50%;
       background-color: transparent;
       cursor: pointer;
@@ -40,6 +37,9 @@
       outline: none !important;
       box-shadow: none !important;
       overflow: visible;
+
+      /* 🔁 Συνεχές animation — bounce + glow μαζί */
+      animation: bounce 2.4s infinite ease-in-out;
     }
     .toggle-chatbox:focus,
     .toggle-chatbox:focus-visible,
@@ -48,47 +48,38 @@
       box-shadow: none !important;
     }
     .toggle-chatbox::-moz-focus-inner {
-      border: 0;
-    }
-
-    @keyframes glow {
-      0%, 100% { opacity: 0.4; transform: scale(1); }
-      50% { opacity: 0.1; transform: scale(1.4); }
-    }
-    .toggle-chatbox::before {
-      content: "";
-      position: absolute;
-      top: -12px;
-      left: -12px;
-      width: 124px;
-      height: 124px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(253,186,116,0.4), transparent 70%);
-      animation: glow 2.2s infinite ease-in-out;
-      z-index: -1;
-      pointer-events: none;
+      border: 0 !important;
     }
 
     @keyframes bounce {
       0%,100% { transform: scale(1); }
       50% { transform: scale(1.15); }
     }
-    .toggle-chatbox:hover {
-      animation: bounce 2s ease-in-out infinite;
+
+    @keyframes glow {
+      0%,100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.1; transform: scale(1.4); }
+    }
+    .toggle-chatbox::before {
+      content: "";
+      position: absolute;
+      top: -12px; left: -12px;
+      width: 124px; height: 124px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(253,186,116,0.4), transparent 70%);
+      animation: glow 2.4s infinite ease-in-out;
+      z-index: -1;
+      pointer-events: none;
     }
 
     .chat-tooltip {
       position: absolute;
-      top: -42px;
-      left: 50%;
+      top: -42px; left: 50%;
       transform: translateX(-50%);
-      background: #111;
-      color: #fff;
-      padding: 6px 12px;
-      font-size: 0.75rem;
+      background: #111; color: #fff;
+      padding: 6px 12px; font-size: 0.75rem;
       border-radius: 0.5rem;
-      opacity: 0;
-      pointer-events: none;
+      opacity: 0; pointer-events: none;
       transition: all 0.3s ease;
       white-space: nowrap;
       z-index: 1002;
@@ -98,11 +89,9 @@
       transform: translate(-50%, -10px);
     }
 
-    /* ——— υπόλοιπο chatbox CSS ——— */
     .chatbox {
       position: fixed;
-      bottom: 6rem;
-      left: 3.5rem;
+      bottom: 6rem; left: 3.5rem;
       width: min(420px, 90vw);
       height: min(750px, 90svh);
       max-width: calc(100vw - 3rem);
@@ -119,7 +108,7 @@
       flex-direction: column;
     }
     .chatbox.show { display: flex; }
-    .chat-header {
+    .chat-header { 
       background: linear-gradient(45deg, #fbbf24, #eab308, #fbbf24);
       padding: 1.25rem;
       display: flex;
@@ -128,7 +117,7 @@
       font-weight: bold;
       font-size: 1.25rem;
       color: #1f2937;
-    }
+     }
     .chat-messages {
       flex: 1;
       padding: 1rem;
@@ -215,7 +204,7 @@
   `;
   document.head.appendChild(style);
 
-  // HTML με tooltip ενσωματωμένο
+  // ✅ HTML markup – πλήρες widget με tooltip!
   const html = `
     <div class="chatbox-wrapper">
       <button class="toggle-chatbox" aria-label="Άνοιγμα συνομιλίας">
@@ -223,18 +212,19 @@
       </button>
       <div class="chatbox" id="chatbox">
         <div class="chat-header">
-          <div>
-            <strong>Mr Booky</strong><br/>
-            <span style="font-size: 0.65rem; font-weight: normal;">Powered by Taxi Express Patras</span>
+          <div><strong>Mr Booky</strong><br/>
+            <span style="font-size:0.65rem;font-weight:normal;">
+              Powered by Taxi Express Patras
+            </span>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
-            <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor: pointer;">close</span>
-            <span class="material-icons clear-chat" title="Καθαρισμός" style="cursor: pointer;">delete_sweep</span>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-left:auto;">
+            <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor:pointer;">close</span>
+            <span class="material-icons clear-chat" title="Καθαρισμός" style="cursor:pointer;">delete_sweep</span>
           </div>
         </div>
         <div class="chat-messages" id="chat-messages"></div>
         <div class="input-area">
-          <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." />
+          <input type="text" id="user-input" placeholder="Πληκτρολογήστε..."/>
           <button id="send-btn" title="Αποστολή">
             <span class="material-icons">send</span>
           </button>
@@ -245,7 +235,7 @@
   `;
   document.body.insertAdjacentHTML("beforeend", html);
 
-  // υπόλοιπος JS κώδικας (listeners, toggle, sendMessage, κλπ.)
+  // 🧩 JS logic 
   const chatbox = document.getElementById("chatbox");
   const chatMessages = document.getElementById("chat-messages");
   const userInput = document.getElementById("user-input");
@@ -254,9 +244,9 @@
   const closeBtn = document.querySelector(".close-chat-btn");
   const clearBtn = document.querySelector(".clear-chat");
   const sendBtn = document.getElementById("send-btn");
+
   let chatOpened = false;
-  let session_id = localStorage.getItem("chat_session_id") 
-    || `sess-${Date.now()}`;
+  let session_id = localStorage.getItem("chat_session_id") || `sess-${Date.now()}`;
   localStorage.setItem("chat_session_id", session_id);
 
   function autoLinkify(text) {
@@ -373,27 +363,16 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    toggleBtn.addEventListener("click", toggleChat);
+    toggleBtn.addEventListener("click", () => {
+      toggleChat();
+      toggleBtn.blur(); // ❌ Απομακρύνει focus 
+    });
     closeBtn?.addEventListener("click", toggleChat);
     clearBtn?.addEventListener("click", clearChat);
     sendBtn?.addEventListener("click", sendMessage);
-    userInput?.addEventListener("keydown", e => {
-      if (e.key === "Enter") sendMessage();
-    });
+    userInput?.addEventListener("keydown", e => e.key === "Enter" && sendMessage());
   });
 
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.querySelector(".toggle-chatbox");
-    if (btn) {
-      btn.style.outline = "none";
-      btn.style.boxShadow = "none";
-      btn.style.webkitTapHighlightColor = "transparent";
-      btn.addEventListener("focus", () => {
-        btn.style.outline = "none";
-        btn.style.boxShadow = "none";
-      });
-    }
-  });
 })();
