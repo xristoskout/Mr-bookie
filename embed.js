@@ -364,20 +364,16 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+   document.addEventListener("DOMContentLoaded", () => {
     toggleBtn.addEventListener("click", () => {
       toggleChat();
-      toggleBtn.blur(); // ❌ Απομακρύνει focus για να μη βγαίνει μπλε
+      toggleBtn.blur(); // για να μη μείνει focus
     });
     closeBtn?.addEventListener("click", toggleChat);
     clearBtn?.addEventListener("click", clearChat);
     sendBtn?.addEventListener("click", sendMessage);
     userInput?.addEventListener("keydown", e => e.key === "Enter" && sendMessage());
   });
-
-  window.sendMessage = sendMessage;
-  window.clearChat = clearChat;
-})();
 
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
