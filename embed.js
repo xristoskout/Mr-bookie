@@ -44,9 +44,12 @@ style.textContent = `
 }
 
 .toggle-chatbox:focus,
-.toggle-chatbox:focus-visible {
-  outline: none;
-  box-shadow: none;
+.toggle-chatbox:focus-visible,
+.toggle-chatbox:active {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-focus-ring-color: transparent !important;
 }
 
 @keyframes bounce {
