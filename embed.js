@@ -359,17 +359,16 @@
     }
   }
 
-   document.addEventListener("DOMContentLoaded", () => {
-    toggleBtn.addEventListener("click", () => {
-      toggleChat();
-      toggleBtn.blur(); // για να μη μείνει focus
-    });
-    closeBtn?.addEventListener("click", toggleChat);
-    clearBtn?.addEventListener("click", clearChat);
-    sendBtn?.addEventListener("click", sendMessage);
-    userInput?.addEventListener("keydown", e => e.key === "Enter" && sendMessage());
+     // 🛡️ Αποτροπή εμφάνισης blue focus background σε desktop/mobile
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.querySelector(".toggle-chatbox");
+    if (btn) {
+      btn.addEventListener("mousedown", e => {
+        e.preventDefault();
+        btn.click();
+      });
+    }
   });
 
-  window.sendMessage = sendMessage;
-  window.clearChat = clearChat;
-})();
+})();  // Τέλος embed.js
+
