@@ -14,7 +14,7 @@
 
     .chatbox-wrapper {
       position: fixed;
-      bottom: 5.5rem;
+      bottom: 1.5rem;
       left: 1.1rem;
       z-index: 1000;
     }
