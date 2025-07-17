@@ -41,13 +41,8 @@
       /* 🔁 Συνεχές animation — bounce + glow μαζί */
       animation: bounce 2.4s infinite ease-in-out;
     }
-    .toggle-chatbox:active,
-.toggle-chatbox:focus,
-.toggle-chatbox:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  background-color: transparent !important;
-  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png') !important;
+    .toggle-chatbox:active {
+  background-color: rgba(255,255,255,0.7) !important; /* λευκό ημιδιάφανο */
 }
     .toggle-chatbox::-moz-focus-inner {
       border: 0 !important;
