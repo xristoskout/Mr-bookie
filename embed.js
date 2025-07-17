@@ -1,66 +1,85 @@
 (() => {
   // 💡 Material Icons
   const link = document.createElement("link");
-  link.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
   link.rel = "stylesheet";
+  link.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
   document.head.appendChild(link);
 
- // 🎨 CSS styling
-const style = document.createElement("style");
-style.textContent = `
-  *, *::before, *::after { box-sizing: border-box; }
-  html, body { height: 100%; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #fefefe, #fefefe, #fefefe);
-  }
-  .chatbox-wrapper {
-    position: fixed;
-    bottom: 5.5rem;
-    left: 1.1rem; /* 👈 Απόλυτα αριστερά */
-    z-index: 1000;
-  }
-
-.toggle-chatbox {
-  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border: none;
-  padding: 0;
-  margin: 0;
-  outline: none;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: none;
-  background-color: transparent;
-  z-index: 1001;
-  transition: transform 0.3s ease;
-  display: inline-block;
-  appearance: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.toggle-chatbox:focus,
-.toggle-chatbox:focus-visible,
-.toggle-chatbox:active {
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-  -webkit-focus-ring-color: transparent !important;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.50); }
-}
-
-.toggle-chatbox:hover {
-  animation: bounce 0.5s ease-in-out infinite;
-    
+  // 🎨 CSS styling + glow ripple + tooltip
+  const style = document.createElement("style");
+  style.textContent = `
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #fefefe, #fefefe, #fefefe);
     }
+    .chatbox-wrapper {
+      position: fixed;
+      bottom: 5.5rem;
+      left: 1.1rem;
+      z-index: 1000;
+    }
+    .toggle-chatbox {
+      background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 100px; height: 100px;
+      border: none; padding: 0; margin: 0;
+      border-radius: 50%;
+      cursor: pointer; box-shadow: none;
+      background-color: transparent;
+      position: relative; z-index: 1001;
+      transition: transform 0.3s ease;
+      appearance: none; -webkit-tap-highlight-color: transparent;
+    }
+    @keyframes glow {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 0.1; transform: scale(1.4); }
+    }
+    .toggle-chatbox::before {
+      content: "";
+      position: absolute;
+      top: -12px; left: -12px;
+      width: 124px; height: 124px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,193,7,0.4), transparent 70%);
+      animation: glow 2s infinite ease-in-out;
+      z-index: -1; pointer-events: none;
+    }
+    .toggle-chatbox:hover .chat-tooltip {
+      opacity: 1; transform: translateY(-10px);
+    }
+    .chat-tooltip {
+      position: absolute;
+      top: -40px; left: 50%;
+      transform: translateX(-50%);
+      background: #111; color: #fff;
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      border-radius: 0.5rem;
+      opacity: 0; pointer-events: none;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      z-index: 1002;
+    }
+    .toggle-chatbox:focus,
+    .toggle-chatbox:focus-visible,
+    .toggle-chatbox:active {
+      outline: none !important;
+      box-shadow: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+      -webkit-focus-ring-color: transparent !important;
+    }
+    @keyframes bounce {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    .toggle-chatbox:hover {
+      animation: bounce 2s ease-in-out infinite;
+    }
+    /* -- υπόλοιπο CSS chatbox (ίδια με δικά σου) -- */
     .chatbox {
       position: fixed;
       bottom: 6rem;
@@ -84,27 +103,11 @@ style.textContent = `
     .chat-header {
       background: linear-gradient(45deg, #fbbf24, #eab308, #fbbf24);
       padding: 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-weight: bold;
-      font-size: 1.25rem;
-      color: #1f2937;
+      display: flex; align-items: center; justify-content: space-between;
+      font-weight: bold; font-size: 1.25rem; color: #1f2937;
     }
-    .chat-messages {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .message {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.5rem;
-      max-width: 85%;
-    }
+    .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; }
+    .message { display: flex; align-items: flex-start; gap: 0.5rem; max-width: 85%; }
     .message.bot { flex-direction: row; align-self: flex-start; }
     .message.user { flex-direction: row-reverse; align-self: flex-end; }
     .message span {
@@ -123,18 +126,13 @@ style.textContent = `
       background: linear-gradient(135deg, #fb923c, #f59e0b);
       color: white;
     }
-    .message img {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-    }
+    .message img { width: 28px; height: 28px; border-radius: 50%; }
     .input-area {
       padding: 1rem;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
       border-top: 1px solid #fbbf24;
-      display: flex;
-      gap: 0.75rem;
+      display: flex; gap: 0.75rem;
     }
     .input-area input {
       flex: 1;
@@ -145,8 +143,7 @@ style.textContent = `
       color: #1f2937;
     }
     .input-area button {
-      width: 3rem;
-      height: 3rem;
+      width: 3rem; height: 3rem;
       background: linear-gradient(135deg, #fb923c, #f59e0b);
       border: none;
       border-radius: 1rem;
@@ -163,8 +160,7 @@ style.textContent = `
     }
     @media (max-width: 768px) {
       .chatbox {
-        top: 0;
-        left: 0;
+        top: 0; left: 0;
         width: 100vw;
         height: 100svh;
         max-width: 100vw;
@@ -177,9 +173,12 @@ style.textContent = `
   `;
   document.head.appendChild(style);
 
+  // HTML με tooltip ενσωματωμένο
   const html = `
     <div class="chatbox-wrapper">
-      <button class="toggle-chatbox" aria-label="Άνοιγμα συνομιλίας"></button>
+      <button class="toggle-chatbox" aria-label="Άνοιγμα συνομιλίας">
+        <span class="chat-tooltip">💬 Chat Now</span>
+      </button>
       <div class="chatbox" id="chatbox">
         <div class="chat-header">
           <div>
@@ -204,6 +203,7 @@ style.textContent = `
   `;
   document.body.insertAdjacentHTML("beforeend", html);
 
+  // υπόλοιπος JS κώδικας (listeners, toggle, sendMessage, κλπ.)
   const chatbox = document.getElementById("chatbox");
   const chatMessages = document.getElementById("chat-messages");
   const userInput = document.getElementById("user-input");
@@ -212,13 +212,13 @@ style.textContent = `
   const closeBtn = document.querySelector(".close-chat-btn");
   const clearBtn = document.querySelector(".clear-chat");
   const sendBtn = document.getElementById("send-btn");
-
   let chatOpened = false;
-  let session_id = localStorage.getItem("chat_session_id") || ("sess-" + Date.now());
+  let session_id = localStorage.getItem("chat_session_id") 
+    || `sess-${Date.now()}`;
   localStorage.setItem("chat_session_id", session_id);
 
   function autoLinkify(text) {
-    const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+     const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const linkRegex = /((https?:\/\/[^\s<>()]+)|(tel:\+?\d+)|(mailto:([^\s<>()]+))|(www\.[^\s<>()]+)|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}))/g;
     return safeText.replace(linkRegex, (match, p1, p2, p3, p4, mailTarget, p6, emailOnly) => {
       let cleanMatch = match.replace(/[.,?!;]+$/, "");
@@ -335,12 +335,11 @@ style.textContent = `
     closeBtn?.addEventListener("click", toggleChat);
     clearBtn?.addEventListener("click", clearChat);
     sendBtn?.addEventListener("click", sendMessage);
-    userInput?.addEventListener("keydown", (e) => {
+    userInput?.addEventListener("keydown", e => {
       if (e.key === "Enter") sendMessage();
     });
   });
 
-  // ✅ Κάνει τις συναρτήσεις global για να λειτουργούν τα onclick στο HTML
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
