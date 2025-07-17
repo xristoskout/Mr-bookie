@@ -41,12 +41,14 @@
       /* 🔁 Συνεχές animation — bounce + glow μαζί */
       animation: bounce 2.4s infinite ease-in-out;
     }
-    .toggle-chatbox:focus,
-    .toggle-chatbox:focus-visible,
-    .toggle-chatbox:active {
-      outline: none !important;
-      box-shadow: none !important;
-    }
+    .toggle-chatbox:active,
+.toggle-chatbox:focus,
+.toggle-chatbox:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png') !important;
+}
     .toggle-chatbox::-moz-focus-inner {
       border: 0 !important;
     }
@@ -365,13 +367,17 @@
   document.addEventListener("DOMContentLoaded", () => {
     toggleBtn.addEventListener("click", () => {
       toggleChat();
-      toggleBtn.blur(); // ❌ Απομακρύνει focus 
+      toggleBtn.blur(); // ❌ Απομακρύνει focus για να μη βγαίνει μπλε
     });
     closeBtn?.addEventListener("click", toggleChat);
     clearBtn?.addEventListener("click", clearChat);
     sendBtn?.addEventListener("click", sendMessage);
     userInput?.addEventListener("keydown", e => e.key === "Enter" && sendMessage());
   });
+
+  window.sendMessage = sendMessage;
+  window.clearChat = clearChat;
+})();
 
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
