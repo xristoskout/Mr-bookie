@@ -384,4 +384,16 @@
 
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.querySelector(".toggle-chatbox");
+    if (btn) {
+      btn.style.outline = "none";
+      btn.style.boxShadow = "none";
+      btn.style.webkitTapHighlightColor = "transparent";
+      btn.addEventListener("focus", () => {
+        btn.style.outline = "none";
+        btn.style.boxShadow = "none";
+      });
+    }
+  });
 })();
