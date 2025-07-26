@@ -253,12 +253,17 @@
     });
   }
 
-  function appendMessage(content, sender) {
+  function appendMessage(content, sender, payload = {}) {
   const m = document.createElement("div");
   m.className = "message " + sender;
   const bubble = document.createElement("span");
 
-  // 📌 Αν υπάρχει HTML <a> άστο raw, αλλιώς κάνε linkify
+  // Αφαίρεση διπλού "📌 Δες τη διαδρομή στον χάρτη"
+  if (sender === "bot") {
+    content = content.replace("📌 Δες τη διαδρομή στον χάρτη", "").trim();
+  }
+
+  // Αν περιέχει HTML (π.χ. <a ...>), μην κάνεις autoLinkify
   if (/<a\s/i.test(content)) {
     bubble.innerHTML = content;
   } else {
@@ -269,42 +274,26 @@
   chatMessages.appendChild(m);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  // 🔔 Αν απαντάει το bot
+  // 🔊 Ήχος και έξτρα κουμπιά για bot
   if (sender === "bot") {
     botSound.play().catch(() => {});
 
-    // 📞 Αν περιέχει αναφορά για τηλέφωνο
+    // ☎️ Τηλεφωνικό κουμπί
     if (/τηλέφωνο|call|κλήση/i.test(content)) {
       const btn = document.createElement("div");
       btn.className = "message bot";
-      btn.innerHTML = `
-        <a href="tel:2610450000" 
-           style="display:inline-block;margin-top:8px;padding:10px 16px;
-                  background:#f59e0b;color:white;border-radius:8px;
-                  font-weight:bold;text-decoration:none;">
-           📞 Κλήση 2610450000
-        </a>`;
+      btn.innerHTML = `<a href="tel:2610450000" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">📞 Κλήση 2610450000</a>`;
       chatMessages.appendChild(btn);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // 🗺️ Αν υπάρχει Google Maps link στη μορφή "📌 Δες τη διαδρομή στον χάρτη"
-    if (/📌 Δες τη διαδρομή στον χάρτη/.test(content)) {
-      const urlMatch = content.match(/https?:\/\/[^\s"]+/);
-      if (urlMatch) {
-        const mapsBtn = document.createElement("div");
-        mapsBtn.className = "message bot";
-        mapsBtn.innerHTML = `
-          <a href="${urlMatch[0]}" 
-             target="_blank"
-             style="display:inline-block;margin-top:8px;padding:10px 16px;
-                    background:#f59e0b;color:white;border-radius:8px;
-                    font-weight:bold;text-decoration:none;">
-            📌 Δες τη διαδρομή στον χάρτη
-          </a>`;
-        chatMessages.appendChild(mapsBtn);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
+    // 🗺️ Κουμπί "Δες τη διαδρομή στον χάρτη"
+    if (payload?.map_url) {
+      const mapBtn = document.createElement("div");
+      mapBtn.className = "message bot";
+      mapBtn.innerHTML = `<a href="${payload.map_url}" target="_blank" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">📌 Δες τη διαδρομή στον χάρτη</a>`;
+      chatMessages.appendChild(mapBtn);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
   }
 }
