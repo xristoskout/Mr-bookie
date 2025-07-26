@@ -254,24 +254,32 @@
   }
 
   function appendMessage(content, sender) {
-    const m = document.createElement("div");
-    m.className = "message " + sender;
-    const bubble = document.createElement("span");
+  const m = document.createElement("div");
+  m.className = "message " + sender;
+  const bubble = document.createElement("span");
+
+  // Εάν το μήνυμα περιέχει HTML (π.χ. <a ...>), άστο ως έχει
+  if (/<a\s/i.test(content)) {
+    bubble.innerHTML = content;
+  } else {
     bubble.innerHTML = autoLinkify(content);
-    m.appendChild(bubble);
-    chatMessages.appendChild(m);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    if (sender==="bot") {
-      botSound.play().catch(()=>{});
-      if (/τηλέφωνο|call|κλήση/i.test(content)) {
-        const btn = document.createElement("div");
-        btn.className="message bot";
-        btn.innerHTML = `<a href="tel:2610450000" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">📞 Κλήση 2610450000</a>`;
-        chatMessages.appendChild(btn);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
+  }
+
+  m.appendChild(bubble);
+  chatMessages.appendChild(m);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  if (sender === "bot") {
+    botSound.play().catch(() => {});
+    if (/τηλέφωνο|call|κλήση/i.test(content)) {
+      const btn = document.createElement("div");
+      btn.className = "message bot";
+      btn.innerHTML = `<a href="tel:2610450000" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">📞 Κλήση 2610450000</a>`;
+      chatMessages.appendChild(btn);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
   }
+}
 
   async function sendMessage() {
     const txt = userInput.value.trim(); if(!txt) return;
