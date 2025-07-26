@@ -253,17 +253,12 @@
     });
   }
 
-  function appendMessage(content, sender, payload = {}) {
+  function appendMessage(content, sender) {
   const m = document.createElement("div");
   m.className = "message " + sender;
   const bubble = document.createElement("span");
 
-  // Αφαίρεση διπλού "📌 Δες τη διαδρομή στον χάρτη"
-  if (sender === "bot") {
-    content = content.replace("📌 Δες τη διαδρομή στον χάρτη", "").trim();
-  }
-
-  // Αν περιέχει HTML (π.χ. <a ...>), μην κάνεις autoLinkify
+  // ✅ Εάν το περιεχόμενο έχει HTML (π.χ. <a>), μην το πειράξεις
   if (/<a\s/i.test(content)) {
     bubble.innerHTML = content;
   } else {
@@ -274,25 +269,46 @@
   chatMessages.appendChild(m);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  // 🔊 Ήχος και έξτρα κουμπιά για bot
+  // ✅ Αν είναι bot μήνυμα, έλεγξε για custom κουμπί διαδρομής
   if (sender === "bot") {
     botSound.play().catch(() => {});
 
-    // ☎️ Τηλεφωνικό κουμπί
-    if (/τηλέφωνο|call|κλήση/i.test(content)) {
-      const btn = document.createElement("div");
-      btn.className = "message bot";
-      btn.innerHTML = `<a href="tel:2610450000" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">📞 Κλήση 2610450000</a>`;
-      chatMessages.appendChild(btn);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+    // 🔍 Αν υπάρχει Google Maps URL στο payload (που δεν εμφανίστηκε μέσα στο bubble)
+    const urlMatch = content.match(/https:\/\/www\.google\.com\/maps\/dir\/[^\s<]+/);
+    if (urlMatch) {
+      const link = urlMatch[0];
+
+      // ✅ Πρόσθεσε κουμπί μόνο αν δεν υπάρχει ήδη στο bubble
+      if (!bubble.innerHTML.includes("Δες τη διαδρομή στον χάρτη")) {
+        const mapButton = document.createElement("div");
+        mapButton.className = "message bot";
+        mapButton.innerHTML = `
+          <a href="${link}" target="_blank"
+            style="display:inline-block;margin-top:8px;padding:10px 16px;
+                   background:#f59e0b;color:white;border-radius:8px;
+                   font-weight:bold;text-decoration:none;
+                   transition: all 0.3s ease;"
+            onmouseover="this.style.background='#facc15'"
+            onmouseout="this.style.background='#f59e0b'">
+            📍 Δες τη διαδρομή στον χάρτη
+          </a>`;
+        chatMessages.appendChild(mapButton);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
     }
 
-    // 🗺️ Κουμπί "Δες τη διαδρομή στον χάρτη"
-    if (payload?.map_url) {
-      const mapBtn = document.createElement("div");
-      mapBtn.className = "message bot";
-      mapBtn.innerHTML = `<a href="${payload.map_url}" target="_blank" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">📌 Δες τη διαδρομή στον χάρτη</a>`;
-      chatMessages.appendChild(mapBtn);
+    // 🔔 Ειδική λογική για τηλέφωνο
+    if (/τηλέφωνο|call|κλήση/i.test(content)) {
+      const callBtn = document.createElement("div");
+      callBtn.className = "message bot";
+      callBtn.innerHTML = `
+        <a href="tel:2610450000"
+          style="display:inline-block;margin-top:8px;padding:10px 16px;
+                 background:#f59e0b;color:white;border-radius:8px;
+                 font-weight:bold;text-decoration:none;">
+          📞 Κλήση 2610450000
+        </a>`;
+      chatMessages.appendChild(callBtn);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
   }
