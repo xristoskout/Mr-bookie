@@ -281,7 +281,7 @@
           style="display:inline-block;margin-top:8px;padding:10px 16px;
           background:#f59e0b;color:white;border-radius:8px;font-weight:bold;
           text-decoration:none;transition:all 0.3s ease-in-out;"
-          onmouseover="this.style.background='#d97706'"
+          onmouseover="this.style.background='#2547f3'"
           onmouseout="this.style.background='#4760e1'">
           📌 Δες τη διαδρομή στον χάρτη
         </a>`;
