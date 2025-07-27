@@ -224,7 +224,7 @@
   `;
   document.body.insertAdjacentHTML("beforeend", html);
 
-  // 4️⃣ Επιλογή στοιχείων
+  // 1️⃣ Επιλογή DOM στοιχείων
   const chatbox = document.getElementById("chatbox");
   const chatMessages = document.getElementById("chat-messages");
   const userInput = document.getElementById("user-input");
@@ -234,134 +234,160 @@
   const clearBtn = document.querySelector(".clear-chat");
   const sendBtn = document.getElementById("send-btn");
 
-  // 5️⃣ Λογική
+  // 2️⃣ Session ID
   let chatOpened = false;
   let session_id = localStorage.getItem("chat_session_id") || `sess-${Date.now()}`;
   localStorage.setItem("chat_session_id", session_id);
 
+  // 3️⃣ Αυτόματη αναγνώριση links, emails κ.λπ.
   function autoLinkify(text) {
-    // ίδια λογική όπως πριν
     const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const re = /((https?:\/\/[^\s<>()]+)|(tel:\+?\d+)|(mailto:([^\s<>()]+))|(www\.[^\s<>()]+)|([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}))/ig;
     return safeText.replace(re, m => {
       let clean = m.replace(/[.,?!;]+$/, "");
       let url = clean, icon = "🔗";
-      if (/^www\./i.test(clean)) { url = "https://" + clean; icon="🌐"; }
-      if (/^tel:/.test(clean)) { icon="📞"; }
-      if (/^mailto:/.test(clean) || /@/.test(clean)) { icon="📧"; url = /^mailto:/.test(clean)?clean:"mailto:"+clean; }
+      if (/^www\./i.test(clean)) { url = "https://" + clean; icon = "🌐"; }
+      if (/^tel:/.test(clean)) { icon = "📞"; }
+      if (/^mailto:/.test(clean) || /@/.test(clean)) {
+        icon = "📧";
+        url = /^mailto:/.test(clean) ? clean : "mailto:" + clean;
+      }
       return `<a href="${url}" target="_blank" style="color:#2563eb;text-decoration:underline;">${icon} ${clean}</a>`;
     });
   }
 
-  function appendMessage(content, sender, payload = {}) {
-  const m = document.createElement("div");
-  m.className = "message " + sender;
-  const bubble = document.createElement("span");
+  // 4️⃣ Εμφάνιση μηνύματος
+  function appendMessage(content, sender) {
+    const m = document.createElement("div");
+    m.className = "message " + sender;
+    const bubble = document.createElement("span");
 
-  // Εάν περιέχει ήδη <a ...>, άστο ως έχει
-  if (/<a\s/i.test(content)) {
-    bubble.innerHTML = content;
-  } else {
-    bubble.innerHTML = autoLinkify(content);
+    if (/<a\s/i.test(content)) {
+      bubble.innerHTML = content;
+    } else {
+      bubble.innerHTML = autoLinkify(content);
+    }
+
+    m.appendChild(bubble);
+    chatMessages.appendChild(m);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    if (sender === "bot") {
+      botSound?.play?.().catch(() => {});
+      if (/τηλέφωνο|call|κλήση/i.test(content)) {
+        const btn = document.createElement("div");
+        btn.className = "message bot";
+        btn.innerHTML = `<a href="tel:2610450000" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">📞 Κλήση 2610450000</a>`;
+        chatMessages.appendChild(btn);
+      }
+    }
   }
 
-  m.appendChild(bubble);
-  chatMessages.appendChild(m);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+  // 5️⃣ Ειδικός χειρισμός για απαντήσεις bot με χάρτη κλπ
+  function renderBotResponse(payload) {
+    if (payload.fulfillment_response?.messages) {
+      payload.fulfillment_response.messages.forEach(msg => {
+        if (msg.text?.text?.length) {
+          const botMsg = document.createElement("div");
+          botMsg.className = "message bot";
+          botMsg.innerHTML = msg.text.text[0];
+          chatMessages.appendChild(botMsg);
+        }
+      });
+    }
 
-  if (sender === "bot") {
-    botSound.play().catch(() => {});
-
-    // 📍 Αν υπάρχει map_url στο payload => πρόσθεσε κουμπί χάρτη
     if (payload.map_url) {
       const mapBtn = document.createElement("div");
       mapBtn.className = "message bot";
+
+      const lang = payload.language_code || "el";
+      const label = lang.startsWith("en")
+        ? "📌 View route on map"
+        : "📌 Δες τη διαδρομή στον χάρτη";
+
       mapBtn.innerHTML = `
         <a href="${payload.map_url}" target="_blank"
           style="display:inline-block;margin-top:8px;padding:10px 16px;
           background:#f59e0b;color:white;border-radius:8px;font-weight:bold;
           text-decoration:none;transition:all 0.3s ease-in-out;"
           onmouseover="this.style.background='#2547f3'"
-          onmouseout="this.style.background='#4760e1'">
-          📌 Δες τη διαδρομή στον χάρτη
+          onmouseout="this.style.background='#f59e0b'">
+          ${label}
         </a>`;
       chatMessages.appendChild(mapBtn);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // 📞 Αν περιέχει τηλέφωνο
-    if (/τηλέφωνο|call|κλήση/i.test(content)) {
-      const btn = document.createElement("div");
-      btn.className = "message bot";
-      btn.innerHTML = `<a href="tel:2610450000" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">📞 Κλήση 2610450000</a>`;
-      chatMessages.appendChild(btn);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
   }
-}
 
+  // 6️⃣ Αποστολή μηνύματος
   async function sendMessage() {
-    const txt = userInput.value.trim(); if(!txt) return;
+    const txt = userInput.value.trim();
+    if (!txt) return;
     appendMessage(txt, "user");
     userInput.value = "";
+
     const t = document.createElement("div");
-    t.className="message bot"; t.innerHTML="<span>Ο Mr Booky γράφει...</span>";
+    t.className = "message bot";
+    t.innerHTML = "<span>Ο Mr Booky γράφει...</span>";
     chatMessages.appendChild(t);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+
     try {
       const res = await fetch("https://ui-api-for-github-160866660933.europe-west1.run.app/chat", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({message:txt,session_id})
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: txt, session_id })
       });
       const data = await res.json();
       t.remove();
-      appendMessage(data.reply||"Λάθος απάντηση", "bot");
-    } catch(e) {
+      appendMessage(data.reply || "Λάθος απάντηση", "bot");
+      renderBotResponse(data);  // 👈 Εμφανίζει κουμπί χάρτη κλπ
+    } catch (e) {
       t.remove();
-      appendMessage("Σφάλμα — δοκίμασε ξανά", "bot");
+      appendMessage("❌ Σφάλμα — δοκίμασε ξανά", "bot");
     }
   }
 
+  // 7️⃣ Εκκαθάριση συνομιλίας
   function clearChat() {
-    chatMessages.innerHTML="";
+    chatMessages.innerHTML = "";
     localStorage.removeItem("chat_session_id");
     session_id = `sess-${Date.now()}`;
     localStorage.setItem("chat_session_id", session_id);
-    appendMessage("Συνομιλία μηδενίστηκε.", "bot");
+    appendMessage("🧹 Συνομιλία μηδενίστηκε.", "bot");
   }
 
+  // 8️⃣ Άνοιγμα/Κλείσιμο chatbox
   function toggleChat() {
     if (!chatbox.classList.contains("show")) {
       chatbox.classList.add("show");
-      toggleBtn.style.display="none";
+      toggleBtn.style.display = "none";
       if (!chatOpened) {
-        appendMessage("Καλώς ήρθατε! Είμαι ο Mr Booky.", "bot");
-        chatOpened=true;
+        appendMessage("👋 Καλώς ήρθες! Είμαι ο Mr Booky.", "bot");
+        chatOpened = true;
       }
     } else {
       chatbox.classList.remove("show");
-      toggleBtn.style.display="inline-block";
+      toggleBtn.style.display = "inline-block";
     }
   }
 
-  // 6️⃣ Event listeners
+  // 9️⃣ Listeners
   document.addEventListener("DOMContentLoaded", () => {
-    if (toggleBtn) {
-      toggleBtn.addEventListener("click", () => {
-        toggleChat();
-        setTimeout(() => toggleBtn.blur(), 1);
-      });
-    }
-    if (closeBtn) closeBtn.addEventListener("click", toggleChat);
-    if (clearBtn) clearBtn.addEventListener("click", clearChat);
-    if (sendBtn) sendBtn.addEventListener("click", sendMessage);
-    if (userInput) userInput.addEventListener("keydown", e => {
+    toggleBtn?.addEventListener("click", () => {
+      toggleChat();
+      setTimeout(() => toggleBtn.blur(), 1);
+    });
+    closeBtn?.addEventListener("click", toggleChat);
+    clearBtn?.addEventListener("click", clearChat);
+    sendBtn?.addEventListener("click", sendMessage);
+    userInput?.addEventListener("keydown", e => {
       if (e.key === "Enter") sendMessage();
     });
   });
 
-  // 7️⃣ Global exports
+  // 🔁 Εξαγωγή παγκόσμιων συναρτήσεων
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
