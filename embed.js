@@ -282,7 +282,7 @@
           background:#f59e0b;color:white;border-radius:8px;font-weight:bold;
           text-decoration:none;transition:all 0.3s ease-in-out;"
           onmouseover="this.style.background='#d97706'"
-          onmouseout="this.style.background='#f59e0b'">
+          onmouseout="this.style.background='#4760e1'">
           📌 Δες τη διαδρομή στον χάρτη
         </a>`;
       chatMessages.appendChild(mapBtn);
