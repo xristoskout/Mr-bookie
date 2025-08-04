@@ -297,25 +297,45 @@
     }
 
     if (payload.map_url) {
-      const mapBtn = document.createElement("div");
-      mapBtn.className = "message bot";
+  const mapBtn = document.createElement("div");
+  mapBtn.className = "message bot";
 
-      const lang = payload.language_code || "el";
-      const label = lang.startsWith("en")
-        ? "📌 View route on map"
-        : "📌 Δες τη διαδρομή στον χάρτη";
+  const lang = payload.language_code || "el";
+  const label = lang.startsWith("en")
+    ? "📌 View route on map"
+    : "📌 Δες τη διαδρομή στον χάρτη";
 
-      mapBtn.innerHTML = `
-        <a href="${payload.map_url}" target="_blank"
-          style="display:inline-block;margin-top:8px;padding:10px 16px;
-          background:#f59e0b;color:white;border-radius:8px;font-weight:bold;
-          text-decoration:none;transition:all 0.3s ease-in-out;"
-          onmouseover="this.style.background='#2547f3'"
-          onmouseout="this.style.background='#f59e0b'">
-          ${label}
-        </a>`;
-      chatMessages.appendChild(mapBtn);
+  mapBtn.innerHTML = `
+    <a href="${payload.map_url}" target="_blank"
+      style="display:inline-block;margin-top:8px;padding:10px 16px;
+      background:#f59e0b;color:white;border-radius:8px;font-weight:bold;
+      text-decoration:none;transition:all 0.3s ease-in-out;"
+      onmouseover="this.style.background='#2547f3'"
+      onmouseout="this.style.background='#f59e0b'">
+      ${label}
+    </a>`;
+
+  // FIX: Εγγυημένο άνοιγμα νέου tab χωρίς να κλείνει το chat
+  const mapA = mapBtn.querySelector("a");
+  mapA.addEventListener("click", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(mapA.href, "_blank");
+  });
+  // (optional) accessibility:
+  mapA.setAttribute("role", "button");
+  mapA.setAttribute("tabindex", "0");
+  mapA.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" || e.key === " ") {
+      window.open(mapA.href, "_blank");
+      e.preventDefault();
+      e.stopPropagation();
     }
+  });
+
+  chatMessages.appendChild(mapBtn);
+}
+
 
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
