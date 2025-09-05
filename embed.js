@@ -202,7 +202,7 @@
       mapBtn.innerHTML = `
         <a href="${payload.map_url}" target="_blank"
           style="display:inline-block;margin-top:8px;padding:10px 16px;
-          background:#f59e0b;color:white;border-radius:8px;font-weight:bold;
+          background:#2547f3;color:white;border-radius:8px;font-weight:bold;
           text-decoration:none;transition:all 0.3s ease-in-out;">
           ${label}
         </a>
@@ -277,3 +277,4 @@
     if (e.key === "Enter") sendMessage();
   });
 })();
+
