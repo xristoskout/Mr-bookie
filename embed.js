@@ -1,4 +1,11 @@
-(function () {
+(() => {
+  // 🔠 Material Icons
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
+  document.head.appendChild(link);
+
+  // 🎨 CSS Styling
   const style = document.createElement("style");
   style.textContent = `
     .chatbox-wrapper {
@@ -129,10 +136,14 @@
       color: white;
       font-size: 1.4rem;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   `;
   document.head.appendChild(style);
 
+  // 🧱 Widget DOM
   const wrapper = document.createElement("div");
   wrapper.className = "chatbox-wrapper";
 
@@ -156,7 +167,7 @@
     <div class="chat-messages" id="chat-messages"></div>
     <div class="input-area">
       <input type="text" id="user-input" placeholder="Πληκτρολογήστε..." />
-      <button id="send-btn"><span class="material-icons">send</span></button>
+      <button id="send-btn" title="Αποστολή"><span class="material-icons">send</span></button>
     </div>
   `;
   wrapper.appendChild(chatbox);
@@ -167,7 +178,6 @@
   const sendBtn = chatbox.querySelector("#send-btn");
   const closeBtn = chatbox.querySelector(".close-chat-btn");
 
-  // Dummy backend
   const proxyUrl = "https://flask-agent-proxy-160866660933.europe-west1.run.app/api/agent";
   let sessionId = localStorage.getItem("chat_session_id") || `sess-${Date.now()}`;
   localStorage.setItem("chat_session_id", sessionId);
@@ -182,13 +192,50 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
   };
 
+  const renderBotResponse = (payload) => {
+    if (payload.map_url) {
+      const mapBtn = document.createElement("div");
+      mapBtn.className = "message bot";
+      const lang = payload.language_code || "el";
+      const label = lang.startsWith("en") ? "📌 View route on map" : "📌 Δες τη διαδρομή στον χάρτη";
+
+      mapBtn.innerHTML = `
+        <a href="${payload.map_url}" target="_blank"
+          style="display:inline-block;margin-top:8px;padding:10px 16px;
+          background:#f59e0b;color:white;border-radius:8px;font-weight:bold;
+          text-decoration:none;transition:all 0.3s ease-in-out;">
+          ${label}
+        </a>
+      `;
+      const a = mapBtn.querySelector("a");
+      a.addEventListener("click", e => {
+        e.preventDefault();
+        window.open(a.href, "_blank");
+      });
+      chatMessages.appendChild(mapBtn);
+    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  };
+
   const sendMessage = async () => {
     const text = userInput.value.trim();
     if (!text) return;
     appendMessage(text, "user");
     userInput.value = "";
 
-    appendMessage("...", "bot");
+    // ➤ Typing Animation Bubble
+    const typingMsg = document.createElement("div");
+    typingMsg.className = "message bot";
+    const typingSpan = document.createElement("span");
+    typingMsg.appendChild(typingSpan);
+    chatMessages.appendChild(typingMsg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    let dots = 0;
+    const typingInterval = setInterval(() => {
+      dots = (dots + 1) % 4;
+      typingSpan.innerText = "Ο Mr Booky γράφει" + ".".repeat(dots);
+    }, 500);
 
     try {
       const res = await fetch(proxyUrl, {
@@ -196,13 +243,19 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, session_id: sessionId })
       });
+
+      clearInterval(typingInterval);
+      typingMsg.remove();
+
       const data = await res.json();
       const botReply = data.reply || "Δεν υπάρχει απάντηση αυτή τη στιγμή.";
-      const lastMsg = chatMessages.querySelector(".message.bot:last-child");
-      lastMsg.querySelector("span").innerText = botReply;
+      appendMessage(botReply, "bot");
+
+      renderBotResponse(data);
     } catch (err) {
-      const lastMsg = chatMessages.querySelector(".message.bot:last-child");
-      lastMsg.querySelector("span").innerText = "⚠️ Σφάλμα σύνδεσης.";
+      clearInterval(typingInterval);
+      typingMsg.remove();
+      appendMessage("⚠️ Σφάλμα σύνδεσης.", "bot");
     }
   };
 
