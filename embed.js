@@ -140,6 +140,19 @@
       align-items: center;
       justify-content: center;
     }
+    @media (max-width: 768px) {
+  .chatbox {
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: 100svh !important;
+    border-radius: 0 !important;
+    max-width: 100vw !important;
+    max-height: 100svh !important;
+    /* Εάν χρειαστεί, βάλε και z-index για σιγουριά */
+    z-index: 10000 !important;
+  }
+  }
   `;
   document.head.appendChild(style);
 
@@ -277,4 +290,5 @@
     if (e.key === "Enter") sendMessage();
   });
 })();
+
 
