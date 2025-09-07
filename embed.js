@@ -131,7 +131,7 @@
     }
 
     .chat-header {
-      background: radial-gradient(ellipse at center, #f8fb11 4%, #2a1d6c 96%);
+      background: radial-gradient(ellipse at center, #f8fb11 2%, #2a1d6c 98%);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
       display: flex;
@@ -596,6 +596,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
