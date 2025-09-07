@@ -328,18 +328,6 @@
   `;
   document.head.appendChild(style);
 
-  <div class="header-text">
-    <div class="booky-title">Mr Booky</div>
-    <div class="booky-subtitle">Powered by Taxi Express Patras</div>
-  </div>
-  <div class="booky-avatar"></div>
-  <div class="header-actions">
-    <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor:pointer;">power_settings_new</span>
-    <span class="material-icons clear-chat" title="Καθαρισμός" style="cursor:pointer;">auto_delete</span>
-  </div>
-</div>
-
-
 
   // 4) Auto glitch loop
   setInterval(() => {
@@ -608,6 +596,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
