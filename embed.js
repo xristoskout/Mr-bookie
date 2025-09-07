@@ -118,7 +118,7 @@
       overflow: hidden;
       display: none;
       background: #fff;
-      background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/Ms%20Booky%20366x567.png');
+      background-image: url('https://raw.githubusercontent.com/xristoskout/gpt_mr_booky/2485e177c6f65b2ec8c43bd672fd82ec310b7112/docs/20250828_1833_Mr_Booky_remix_01k3rmv7ggf6cstnynmsxx21rp.png');
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center center;
@@ -131,7 +131,7 @@
     }
 
     .chat-header {
-      background: radial-gradient(ellipse at center, #f8fb11 5%, #ba091e 95%);
+      background: radial-gradient(ellipse at center, #f8fb11 4%, #2a1d6c 96%);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
       display: flex;
@@ -596,6 +596,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
