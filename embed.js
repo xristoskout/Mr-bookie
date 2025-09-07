@@ -263,32 +263,38 @@
 
   // 8) Send flow
   async function sendMessage() {
-    const txt = userInput.value.trim();
-    if (!txt) return;
-    appendMessage(txt, "user");
-    userInput.value = "";
+  const txt = userInput.value.trim();
+  if (!txt) return;
+  appendMessage(txt, "user");
+  userInput.value = "";
 
-    const t = document.createElement("div");
-    t.className = "message bot";
-    t.innerHTML = "<span>Ο Mr Booky γράφει...</span>";
-    chatMessages.appendChild(t);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+  const t = document.createElement("div");
+  t.className = "message bot";
+  t.innerHTML = `
+    <div class="typing-indicator">
+      <span>🐾</span><span>✨</span><span>🌟</span>
+    </div>
+    <span style="margin-left: 10px;">🧙‍♂️ Ο Mr Booky γράφει...</span>
+  `;
+  chatMessages.appendChild(t);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    try {
-      const res = await fetch("https://flask-agent-proxy-160866660933.europe-west1.run.app/api/agent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: txt, session_id })
-      });
-      const data = await res.json();
-      t.remove();
-      appendMessage(data.reply || "Λάθος απάντηση", "bot");
-      renderBotResponse(data);
-    } catch (e) {
-      t.remove();
-      appendMessage("❌ Σφάλμα — δοκίμασε ξανά", "bot");
-    }
+  try {
+    const res = await fetch("https://flask-agent-proxy-160866660933.europe-west1.run.app/api/agent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: txt, session_id })
+    });
+    const data = await res.json();
+    t.remove();
+    appendMessage(data.reply || "Λάθος απάντηση", "bot");
+    renderBotResponse(data);
+  } catch (e) {
+    t.remove();
+    appendMessage("❌ Σφάλμα — δοκίμασε ξανά", "bot");
   }
+}
+
 
   // 9) Clear
   function clearChat() {
@@ -327,6 +333,7 @@
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
