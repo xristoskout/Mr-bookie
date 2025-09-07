@@ -1,11 +1,12 @@
+
 (() => {
-  // 🔠 Material Icons
+  // 🔠 Material Icons (fixed href)
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "https://fonts.googleapis.com/icon?family=Material+Material+Icons|Material+Icons+Outlined";
+  link.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
   document.head.appendChild(link);
 
-  // 🎨 CSS Styling
+  // 🎨 CSS Styling (fixed wrapping + reset vertical writing)
   const style = document.createElement("style");
   style.textContent = `
     .chatbox-wrapper {
@@ -44,14 +45,8 @@
       z-index: -1;
       pointer-events: none;
     }
-    @keyframes bounce {
-      0%,100% { transform: scale(1); }
-      50% { transform: scale(1.15); }
-    }
-    @keyframes glow {
-      0%,100% { opacity: 0.4; transform: scale(1); }
-      50% { opacity: 0.1; transform: scale(1.4); }
-    }
+    @keyframes bounce { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+    @keyframes glow { 0%,100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.1; transform: scale(1.4); } }
 
     .chatbox {
       position: fixed;
@@ -67,9 +62,7 @@
       z-index: 1000;
       overflow: hidden;
     }
-    .chatbox.show {
-      display: flex;
-    }
+    .chatbox.show { display: flex; }
     .chat-header {
       background: linear-gradient(45deg, #fbbf24, #eab308, #fbbf24);
       padding: 1rem;
@@ -92,20 +85,26 @@
       background-repeat: no-repeat;
       background-position: center;
     }
-    .message {
-      display: flex;
-      max-width: 85%;
-      gap: 0.5rem;
-    }
+    .message { display: flex; max-width: 85%; gap: 0.5rem; }
     .message.bot { align-self: flex-start; flex-direction: row; }
     .message.user { align-self: flex-end; flex-direction: row-reverse; }
+
+    /* ✅ FIX: reset any vertical writing coming from page CSS */
     .message span {
+      display: inline-block;
       padding: 0.75rem 1rem;
       border-radius: 1rem;
       font-size: 0.9rem;
       box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      word-break: break-word;
-      white-space: pre-wrap;
+      /* wrapping fixes */
+      white-space: normal;             /* instead of pre-wrap */
+      word-break: normal;              /* reset */
+      overflow-wrap: anywhere;         /* allow breaks only when needed */
+      hyphens: auto;                   /* nicer Greek wrapping */
+      writing-mode: horizontal-tb;     /* override any vertical-rl */
+      text-orientation: mixed;         /* default */
+      letter-spacing: normal;
+      max-width: 100%;
     }
     .message.bot span {
       background: linear-gradient(135deg, #fef3c7, #fde68a);
@@ -118,48 +117,31 @@
     .message.bot span a {
       color: #1d4ed8;
       text-decoration: underline;
-      word-break: break-word;
+      word-break: break-word; /* for long URLs only */
     }
+
     .input-area {
-      display: flex;
-      gap: 0.5rem;
-      padding: 1rem;
-      background: rgba(255,255,255,0.98);
-      backdrop-filter: blur(10px);
+      display: flex; gap: 0.5rem; padding: 1rem;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(10px);
     }
     .input-area input {
-      flex: 1;
-      border: 1px solid #ccc;
-      padding: 0.75rem 1rem;
-      border-radius: 1rem;
-      font-size: 1rem;
+      flex: 1; border: 1px solid #ccc; padding: 0.75rem 1rem; border-radius: 1rem; font-size: 1rem;
     }
     .input-area button {
-      width: 3rem;
-      height: 3rem;
+      width: 3rem; height: 3rem;
       background: linear-gradient(135deg, #fb923c, #f59e0b);
-      border: none;
-      border-radius: 1rem;
-      color: white;
-      font-size: 1.4rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border: none; border-radius: 1rem; color: white; font-size: 1.4rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
     }
+
     .qr-wrap{ margin-top:8px; display:flex; align-items:center; gap:.5rem; }
     .qr-wrap canvas, .qr-wrap img{ width:110px; height:110px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.12); }
     .qr-label{ font-size:.85rem; color:#111; background:#fff7ed; padding:.35rem .5rem; border-radius:.5rem; }
 
     @media (max-width: 768px) {
       .chatbox {
-        left: 0 !important;
-        top: 0 !important;
-        width: 100vw !important;
-        height: 100svh !important;
-        border-radius: 0 !important;
-        max-width: 100vw !important;
-        max-height: 100svh !important;
+        left: 0 !important; top: 0 !important; width: 100vw !important; height: 100svh !important;
+        border-radius: 0 !important; max-width: 100vw !important; max-height: 100svh !important;
         z-index: 10000 !important;
       }
     }
@@ -183,9 +165,7 @@
         <strong>Mr Booky</strong><br/>
         <span style="font-size: 0.65rem; font-weight: normal;">Powered by Taxi Express Patras</span>
       </div>
-      <div>
-        <span class="material-icons close-chat-btn" style="cursor:pointer;">close</span>
-      </div>
+      <div><span class="material-icons close-chat-btn" style="cursor:pointer;">close</span></div>
     </div>
     <div class="chat-messages" id="chat-messages"></div>
     <div class="input-area">
@@ -217,16 +197,20 @@
 
   const autoLink = (s) =>
     (s || "").replace(/((https?:\/\/)[^\s<]+)/g, (m) => {
-      // Απόφυγε διπλή μετατροπή
+      // Απόφυγε διπλή μετατροπή αν ήδη υπάρχουν <a>
       if (/(<a\s[^>]*href=)/i.test(s)) return m;
       const safe = m.replace(/"/g, "&quot;");
       return `<a href="${safe}" target="_blank" rel="noopener noreferrer">${safe}</a>`;
     });
 
-  const nl2br = (s) => (s || "").replace(/\n/g, "<br>");
+  // κρατάμε \n για παράγραφους αλλά όχι “pre” spacing
+  const nl2p = (s) => {
+    const parts = String(s || "").split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+    return parts.map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`).join("");
+  };
 
   const sanitize = (html) => {
-    const allowTags = new Set(["A","BR","STRONG","EM","B","I"]);
+    const allowTags = new Set(["A","BR","STRONG","EM","B","I","P"]);
     const allowAttrs = { "A": new Set(["href","target","rel"]) };
     const tmp = document.createElement("div");
     tmp.innerHTML = html;
@@ -240,18 +224,13 @@
           el.replaceWith(span);
           continue;
         }
-        // καθάρισε attrs
         Array.from(el.attributes).forEach(attr => {
           if (!allowAttrs[el.tagName]?.has(attr.name.toLowerCase())) el.removeAttribute(attr.name);
         });
         if (el.tagName === "A") {
           const href = el.getAttribute("href") || "";
-          if (!/^https?:\/\//i.test(href)) {
-            el.removeAttribute("href");
-          } else {
-            el.setAttribute("target","_blank");
-            el.setAttribute("rel","noopener noreferrer");
-          }
+          if (!/^https?:\/\//i.test(href)) el.removeAttribute("href");
+          else { el.setAttribute("target","_blank"); el.setAttribute("rel","noopener noreferrer"); }
         }
         walk(el);
       }
@@ -261,7 +240,7 @@
   };
 
   const renderRich = (text) => {
-    const html = sanitize(nl2br(autoLink(mdLinksToHtml(String(text || "")))));
+    const html = sanitize(nl2p(autoLink(mdLinksToHtml(String(text || "")))));
     return html;
   };
 
@@ -277,11 +256,7 @@
     const tmp = document.createElement("div");
     tmp.innerHTML = html;
     const anchors = Array.from(tmp.querySelectorAll("a[href]"));
-    const QR_HOSTS = [
-      "booking.infoxoros.com",
-      "grtaxi.eu",
-      "taxipatras.com",
-    ];
+    const QR_HOSTS = ["booking.infoxoros.com","grtaxi.eu","taxipatras.com"];
     return anchors
       .map(a => a.getAttribute("href"))
       .filter(href => {
@@ -324,7 +299,7 @@
       const special = findSpecialLinks(html);
       renderQRBelow(message, special);
     } else {
-      span.innerText = text;
+      span.textContent = text; // user: plain text
       message.appendChild(span);
       chatMessages.appendChild(message);
     }
@@ -338,7 +313,6 @@
       mapBtn.className = "message bot";
       const lang = payload.language_code || "el";
       const label = lang.startsWith("en") ? "📌 View route on map" : "📌 Δες τη διαδρομή στον χάρτη";
-
       mapBtn.innerHTML = `
         <a href="${payload.map_url}" target="_blank" rel="noopener noreferrer"
           style="display:inline-block;margin-top:8px;padding:10px 16px;
@@ -377,7 +351,7 @@
     let dots = 0;
     const typingInterval = setInterval(() => {
       dots = (dots + 1) % 4;
-      typingSpan.innerText = "Ο Mr Booky γράφει" + ".".repeat(dots);
+      typingSpan.textContent = "Ο Mr Booky γράφει" + ".".repeat(dots);
     }, 500);
 
     try {
@@ -418,9 +392,7 @@
   });
 
   sendBtn.addEventListener("click", sendMessage);
-  userInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
-  });
+  userInput.addEventListener("keydown", (e) => { if (e.key === "Enter") sendMessage(); });
 })();
 
 
