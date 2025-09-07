@@ -55,30 +55,6 @@
     }
     .toggle-chatbox:hover .chat-tooltip { opacity: 1; transform: translate(-50%, -10px); }
 
-    .orbiting-taxi {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 28px;
-  height: 28px;
-  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/cc4af7d794ad21a7834b4d63c5dc10d5c8fa936d/BOOKY.TELIKO.HQ.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  pointer-events: none;
-  z-index: 1;
-  transform: translate(-50%, -50%);
-  animation: orbit-taxi 4s linear infinite;
-}
-
-@keyframes orbit-taxi {
-  0% {
-    transform: rotate(0deg) translateX(60px) rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg) translateX(60px) rotate(-360deg);
-  }
-}
-
     .chatbox {
       position: fixed; bottom: 6rem; left: 3.5rem;
       width: min(420px, 90vw); height: min(750px, 90svh);
@@ -131,7 +107,6 @@
   <div class="chatbox-wrapper">
     <button class="toggle-chatbox" tabindex="-1" aria-label="Άνοιγμα συνομιλίας">
       <span class="chat-tooltip">💬 Chat Now</span>
-      <span class="orbiting-taxi"></span>
     </button>
     <div class="chatbox" id="chatbox">
       <div class="chat-header">
@@ -385,6 +360,7 @@ t.innerHTML = `
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
