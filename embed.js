@@ -1,8 +1,9 @@
+<script>
 (() => {
   // 🔠 Material Icons
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
+  link.href = "https://fonts.googleapis.com/icon?family=Material+Material+Icons|Material+Icons+Outlined";
   document.head.appendChild(link);
 
   // 🎨 CSS Styling
@@ -104,6 +105,8 @@
       border-radius: 1rem;
       font-size: 0.9rem;
       box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      word-break: break-word;
+      white-space: pre-wrap;
     }
     .message.bot span {
       background: linear-gradient(135deg, #fef3c7, #fde68a);
@@ -112,6 +115,11 @@
     .message.user span {
       background: linear-gradient(135deg, #fb923c, #f59e0b);
       color: white;
+    }
+    .message.bot span a {
+      color: #1d4ed8;
+      text-decoration: underline;
+      word-break: break-word;
     }
     .input-area {
       display: flex;
@@ -140,19 +148,22 @@
       align-items: center;
       justify-content: center;
     }
+    .qr-wrap{ margin-top:8px; display:flex; align-items:center; gap:.5rem; }
+    .qr-wrap canvas, .qr-wrap img{ width:110px; height:110px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.12); }
+    .qr-label{ font-size:.85rem; color:#111; background:#fff7ed; padding:.35rem .5rem; border-radius:.5rem; }
+
     @media (max-width: 768px) {
-  .chatbox {
-    left: 0 !important;
-    top: 0 !important;
-    width: 100vw !important;
-    height: 100svh !important;
-    border-radius: 0 !important;
-    max-width: 100vw !important;
-    max-height: 100svh !important;
-    /* Εάν χρειαστεί, βάλε και z-index για σιγουριά */
-    z-index: 10000 !important;
-  }
-  }
+      .chatbox {
+        left: 0 !important;
+        top: 0 !important;
+        width: 100vw !important;
+        height: 100svh !important;
+        border-radius: 0 !important;
+        max-width: 100vw !important;
+        max-height: 100svh !important;
+        z-index: 10000 !important;
+      }
+    }
   `;
   document.head.appendChild(style);
 
@@ -191,21 +202,138 @@
   const sendBtn = chatbox.querySelector("#send-btn");
   const closeBtn = chatbox.querySelector(".close-chat-btn");
 
+  // 📡 Backend proxy
   const proxyUrl = "https://flask-agent-proxy-160866660933.europe-west1.run.app/api/agent";
   let sessionId = localStorage.getItem("chat_session_id") || `sess-${Date.now()}`;
   localStorage.setItem("chat_session_id", sessionId);
+
+  // ─────────────────────────────────────────────────────────
+  // 🔧 Helpers: Markdown→HTML, autolink, sanitizer, QR
+  const mdLinksToHtml = (s) =>
+    (s || "").replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, txt, url) => {
+      const safeUrl = String(url).replace(/"/g, "&quot;");
+      const safeTxt = String(txt).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeTxt}</a>`;
+    });
+
+  const autoLink = (s) =>
+    (s || "").replace(/((https?:\/\/)[^\s<]+)/g, (m) => {
+      // Απόφυγε διπλή μετατροπή
+      if (/(<a\s[^>]*href=)/i.test(s)) return m;
+      const safe = m.replace(/"/g, "&quot;");
+      return `<a href="${safe}" target="_blank" rel="noopener noreferrer">${safe}</a>`;
+    });
+
+  const nl2br = (s) => (s || "").replace(/\n/g, "<br>");
+
+  const sanitize = (html) => {
+    const allowTags = new Set(["A","BR","STRONG","EM","B","I"]);
+    const allowAttrs = { "A": new Set(["href","target","rel"]) };
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+
+    const walk = (node) => {
+      const children = Array.from(node.children);
+      for (const el of children) {
+        if (!allowTags.has(el.tagName)) {
+          const span = document.createElement("span");
+          span.textContent = el.textContent;
+          el.replaceWith(span);
+          continue;
+        }
+        // καθάρισε attrs
+        Array.from(el.attributes).forEach(attr => {
+          if (!allowAttrs[el.tagName]?.has(attr.name.toLowerCase())) el.removeAttribute(attr.name);
+        });
+        if (el.tagName === "A") {
+          const href = el.getAttribute("href") || "";
+          if (!/^https?:\/\//i.test(href)) {
+            el.removeAttribute("href");
+          } else {
+            el.setAttribute("target","_blank");
+            el.setAttribute("rel","noopener noreferrer");
+          }
+        }
+        walk(el);
+      }
+    };
+    walk(tmp);
+    return tmp.innerHTML;
+  };
+
+  const renderRich = (text) => {
+    const html = sanitize(nl2br(autoLink(mdLinksToHtml(String(text || "")))));
+    return html;
+  };
+
+  const loadQR = () => new Promise((resolve) => {
+    if (window.QRCode) return resolve();
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+    s.onload = resolve;
+    document.head.appendChild(s);
+  });
+
+  const findSpecialLinks = (html) => {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    const anchors = Array.from(tmp.querySelectorAll("a[href]"));
+    const QR_HOSTS = [
+      "booking.infoxoros.com",
+      "grtaxi.eu",
+      "taxipatras.com",
+    ];
+    return anchors
+      .map(a => a.getAttribute("href"))
+      .filter(href => {
+        try { return QR_HOSTS.some(h => new URL(href).host.includes(h)); }
+        catch { return false; }
+      });
+  };
+
+  const renderQRBelow = async (container, urls) => {
+    if (!urls || !urls.length) return;
+    await loadQR();
+    urls.forEach((u) => {
+      const wrap = document.createElement("div");
+      wrap.className = "qr-wrap";
+      const box = document.createElement("div");
+      const label = document.createElement("span");
+      label.className = "qr-label";
+      label.textContent = "Σκάναρε για άμεση πρόσβαση";
+      wrap.appendChild(box);
+      wrap.appendChild(label);
+      container.appendChild(wrap);
+      new QRCode(box, { text: u, width: 110, height: 110, correctLevel: QRCode.CorrectLevel.M });
+    });
+  };
+
+  // ─────────────────────────────────────────────────────────
+  // 💬 Render helpers
 
   const appendMessage = (text, sender) => {
     const message = document.createElement("div");
     message.className = `message ${sender}`;
     const span = document.createElement("span");
-    span.innerText = text;
-    message.appendChild(span);
-    chatMessages.appendChild(message);
+
+    if (sender === "bot") {
+      const html = renderRich(text);
+      span.innerHTML = html;
+      message.appendChild(span);
+      chatMessages.appendChild(message);
+      // QR μόνο για ειδικά links
+      const special = findSpecialLinks(html);
+      renderQRBelow(message, special);
+    } else {
+      span.innerText = text;
+      message.appendChild(span);
+      chatMessages.appendChild(message);
+    }
     chatMessages.scrollTop = chatMessages.scrollHeight;
   };
 
   const renderBotResponse = (payload) => {
+    // Κουμπί για map_url (αν έρθει από backend)
     if (payload.map_url) {
       const mapBtn = document.createElement("div");
       mapBtn.className = "message bot";
@@ -213,7 +341,7 @@
       const label = lang.startsWith("en") ? "📌 View route on map" : "📌 Δες τη διαδρομή στον χάρτη";
 
       mapBtn.innerHTML = `
-        <a href="${payload.map_url}" target="_blank"
+        <a href="${payload.map_url}" target="_blank" rel="noopener noreferrer"
           style="display:inline-block;margin-top:8px;padding:10px 16px;
           background:#2547f3;color:white;border-radius:8px;font-weight:bold;
           text-decoration:none;transition:all 0.3s ease-in-out;">
@@ -223,12 +351,15 @@
       const a = mapBtn.querySelector("a");
       a.addEventListener("click", e => {
         e.preventDefault();
-        window.open(a.href, "_blank");
+        window.open(a.href, "_blank", "noopener,noreferrer");
       });
       chatMessages.appendChild(mapBtn);
     }
     chatMessages.scrollTop = chatMessages.scrollHeight;
   };
+
+  // ─────────────────────────────────────────────────────────
+  // 🚀 Send flow
 
   const sendMessage = async () => {
     const text = userInput.value.trim();
@@ -263,7 +394,6 @@
       const data = await res.json();
       const botReply = data.reply || "Δεν υπάρχει απάντηση αυτή τη στιγμή.";
       appendMessage(botReply, "bot");
-
       renderBotResponse(data);
     } catch (err) {
       clearInterval(typingInterval);
@@ -271,6 +401,9 @@
       appendMessage("⚠️ Σφάλμα σύνδεσης.", "bot");
     }
   };
+
+  // ─────────────────────────────────────────────────────────
+  // 🎛️ UI bindings
 
   toggleBtn.addEventListener("click", () => {
     chatbox.classList.add("show");
@@ -290,5 +423,6 @@
     if (e.key === "Enter") sendMessage();
   });
 })();
+</script>
 
 
