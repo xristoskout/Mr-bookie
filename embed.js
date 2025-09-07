@@ -61,7 +61,7 @@
   left: 50%;
   width: 28px;
   height: 28px;
-  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/taxi-icon.png');
+  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/cc4af7d794ad21a7834b4d63c5dc10d5c8fa936d/BOOKY.TELIKO.HQ.png');
   background-size: contain;
   background-repeat: no-repeat;
   pointer-events: none;
@@ -385,6 +385,7 @@ t.innerHTML = `
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
