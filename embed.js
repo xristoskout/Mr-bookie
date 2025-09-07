@@ -269,15 +269,25 @@
   userInput.value = "";
 
   const t = document.createElement("div");
-  t.className = "message bot";
-  t.innerHTML = `
-    <div class="typing-bubble">
-      Ο Mr Booky γράφει
-      <span class="typing-dots">
-        <span>🟢</span><span>🟡</span><span>🔴</span>
-      </span>
-    </div>
-  `;
+t.className = "message bot";
+t.innerHTML = `
+  <div class="typing-bubble" style="display: flex; align-items: center; gap: 0.75rem;">
+    <span>Ο Mr Booky γράφει</span>
+    <span class="svg-typing">
+      <svg width="36" height="12" viewBox="0 0 40 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="6" cy="6" r="6" fill="#34d399">
+          <animate attributeName="opacity" values="0.2;1;0.2" dur="1.2s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <circle cx="20" cy="6" r="6" fill="#facc15">
+          <animate attributeName="opacity" values="0.2;1;0.2" dur="1.2s" repeatCount="indefinite" begin="0.2s"/>
+        </circle>
+        <circle cx="34" cy="6" r="6" fill="#f87171">
+          <animate attributeName="opacity" values="0.2;1;0.2" dur="1.2s" repeatCount="indefinite" begin="0.4s"/>
+        </circle>
+      </svg>
+    </span>
+  </div>
+`;
   chatMessages.appendChild(t);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -337,6 +347,7 @@
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
