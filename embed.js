@@ -81,6 +81,44 @@
     .message.user span { background: linear-gradient(135deg, #fb923c, #f59e0b); color: #fff; }
     .message.bot span a { color: #2563eb; text-decoration: underline; word-break: break-word; }
 
+    .typing-bubble {
+      display: inline;
+      font-size: 16px;
+      color: #444;
+      animation: pulse-glow 2s infinite ease-in-out;
+    }
+    .typing-dots {
+      display: inline-flex;
+      gap: 4px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .typing-dots span {
+      display: inline-block;
+      animation: bounce 1.4s infinite ease-in-out;
+    }
+    .typing-dots span:nth-child(1) { animation-delay: 0s; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-8px); }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        text-shadow: 0 0 4px rgba(253,224,71,0.5);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+        text-shadow: 0 0 12px rgba(253,224,71,0.8);
+      }
+    }
+
     .input-area {
       padding: 1rem; background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
       border-top: 1px solid #fbbf24; display: flex; gap: .75rem;
@@ -103,7 +141,7 @@
   document.head.appendChild(style);
 
   // 3) HTML
-  const html = `
+   const html = `
     <div class="chatbox-wrapper">
       <button class="toggle-chatbox" tabindex="-1" aria-label="Άνοιγμα συνομιλίας">
         <span class="chat-tooltip">💬 Chat Now</span>
@@ -126,190 +164,166 @@
       </div>
     </div>
     <audio id="botSound" src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/wet-431.mp3" preload="auto"></audio>
+    <audio id="typingSound" src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/soft-type-loop.mp3" preload="auto" loop></audio>
   `;
   document.body.insertAdjacentHTML("beforeend", html);
 
-  // 4) DOM refs
+  // 4) DOM references
   const chatbox = document.getElementById("chatbox");
   const chatMessages = document.getElementById("chat-messages");
   const userInput = document.getElementById("user-input");
   const botSound = document.getElementById("botSound");
+  const typingSound = document.getElementById("typingSound");
   const toggleBtn = document.querySelector(".toggle-chatbox");
   const closeBtn = document.querySelector(".close-chat-btn");
   const clearBtn = document.querySelector(".clear-chat");
   const sendBtn = document.getElementById("send-btn");
 
-  // 5) Session
+  // 5) Session management
   let chatOpened = false;
-  let session_id = localStorage.getItem("chat_session_id") || `sess-${Date.now()}`;
+  let session_id = localStorage.getItem("chat_session_id") || \`sess-\${Date.now()}\`;
   localStorage.setItem("chat_session_id", session_id);
 
-  // 6) Markdown-to-plainText-with-URL (χωρίς αγκύλες)
-  const mdLinksToHtml = (s) =>
-    (s || "").replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, txt, rawUrl) => {
-      // καθάρισε "🔗 " αν υπάρχει μέσα στην παρενθέση
-      let cleanUrl = String(rawUrl).replace(/^🔗\s*/i, "").trim();
-      if (/^www\./i.test(cleanUrl)) cleanUrl = "https://" + cleanUrl;
-      const safeTxt = String(txt).replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      const safeUrl = cleanUrl.replace(/"/g, "&quot;");
-      // Παράγουμε: κείμενο (🔗 url) όπου το url είναι clickable
-      return `${safeTxt} (<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">🔗 ${safeUrl}</a>)`;
-    });
+  // 6) Markdown & autolink
+  const mdLinksToHtml = s => (s || "").replace(/\\[([^\\]]+)\\]\\(([^)]+)\\)/g, (_, txt, rawUrl) => {
+    let cleanUrl = rawUrl.replace(/^🔗\\s*/i, "").trim();
+    if (/^www\\./i.test(cleanUrl)) cleanUrl = "https://" + cleanUrl;
+    const safeTxt = txt.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safeUrl = cleanUrl.replace(/"/g, "&quot;");
+    return \`\${safeTxt} (<a href="\${safeUrl}" target="_blank" rel="noopener noreferrer">🔗 \${safeUrl}</a>)\`;
+  });
 
-  // 6b) Auto-linker για γυμνά urls/emails/τηλέφωνα (προστασία υπαρχόντων <a>)
   function autoLinkify(input) {
-    // 1) Μετατροπή markdown πρώτα
     let text = mdLinksToHtml(String(input));
-
-    // 2) Προστάτεψε ήδη-δημιουργημένα anchors
     const anchors = [];
-    text = text.replace(/<a\b[^>]*>.*?<\/a>/gis, (m) => {
+    text = text.replace(/<a\\b[^>]*>.*?<\\/a>/gis, m => {
       anchors.push(m);
-      return `__A${anchors.length - 1}__`;
+      return \`__A\${anchors.length - 1}__\`;
     });
-
-    // 3) Linkify τα υπόλοιπα καθαρά κείμενα
-    //   - URLs, www., emails, tel:
     text = text
       .replace(/</g, "&lt;").replace(/>/g, "&gt;")
-      .replace(/((https?:\/\/[^\s<>()]+))/ig, (m) =>
-        `<a href="${m}" target="_blank" rel="noopener noreferrer">🔗 ${m}</a>`)
-      .replace(/\b(www\.[^\s<>()]+)\b/ig, (m) => {
-        const url = "https://" + m;
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer">🌐 ${m}</a>`;
-      })
-      .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/ig, (m) =>
-        `<a href="mailto:${m}" target="_blank" rel="noopener noreferrer">📧 ${m}</a>`)
-      .replace(/\btel:\+?\d+\b/ig, (m) =>
-        `<a href="${m}" target="_blank" rel="noopener noreferrer">📞 ${m.replace(/^tel:/i,"")}</a>`)
-      // Ελληνικοί αριθμοί τηλεφώνου: 10ψήφιος, δέχεται κενά/παύλες (π.χ. 2610 450000)
-      .replace(/\b(2\d{3})[ -]?(\d{6})\b/g, (m, p1, p2) => {
-        const digits = `${p1}${p2}`;
-        const e164 = `+30${digits}`;
-        return `<a href="tel:${e164}" target="_blank" rel="noopener noreferrer">📞 ${p1} ${p2}</a>`;
+      .replace(/((https?:\\/\\/[^\\s<>()]+))/ig, m => \`<a href="\${m}" target="_blank" rel="noopener noreferrer">🔗 \${m}</a>\`)
+      .replace(/\\b(www\\.[^\\s<>()]+)\\b/ig, m => \`<a href="https://\${m}" target="_blank" rel="noopener noreferrer">🌐 \${m}</a>\`)
+      .replace(/\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b/ig, m => \`<a href="mailto:\${m}" target="_blank" rel="noopener noreferrer">📧 \${m}</a>\`)
+      .replace(/\\btel:\\+?\\d+\\b/ig, m => \`<a href="\${m}" target="_blank" rel="noopener noreferrer">📞 \${m.replace(/^tel:/i,"")}</a>\`)
+      .replace(/\\b(2\\d{3})[ -]?(\\d{6})\\b/g, (m, p1, p2) => {
+        const digits = p1 + p2;
+        const e164 = "+30" + digits;
+        return \`<a href="tel:\${e164}" target="_blank" rel="noopener noreferrer">📞 \${p1} \${p2}</a>\`;
       });
-
-    // 4) Επαναφορά anchors
-    text = text.replace(/__A(\d+)__/g, (_, i) => anchors[Number(i)]);
-
-    return text;
+    return text.replace(/__A(\\d+)__/g, (_, i) => anchors[Number(i)]);
   }
 
-  // 7) Rendering
+  // 7) appendMessage
   function appendMessage(content, sender) {
     const m = document.createElement("div");
     m.className = "message " + sender;
     const bubble = document.createElement("span");
-
-    if (sender === "bot") {
-      bubble.innerHTML = autoLinkify(content);
-    } else {
-      bubble.textContent = content;
-    }
-
+    bubble.innerHTML = sender === "bot" ? autoLinkify(content) : content;
     m.appendChild(bubble);
     chatMessages.appendChild(m);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // CTA για κλήση – αναγνώριση και με κενά/emoji
     if (sender === "bot") {
-      const hasCallWord = /(τηλέφων|call|κλήση)/i.test(content);
-      const hasNumber = /(2610[\s-]?45\s?0000|2610450000)/.test(content);
-      if (hasCallWord || hasNumber) {
+      const hasCall = /(τηλέφων|call|κλήση)/i.test(content);
+      const hasNum = /(2610[\\s-]?45\\s?0000|2610450000)/.test(content);
+      if (hasCall || hasNum) {
         const btn = document.createElement("div");
         btn.className = "message bot";
-        btn.innerHTML = `
+        btn.innerHTML = \`
           <a href="tel:+302610450000"
              style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">
             📞 Κλήση 2610450000
-          </a>`;
+          </a>\`;
         chatMessages.appendChild(btn);
       }
       botSound?.play?.().catch(() => {});
     }
   }
 
+  // 8) renderBotResponse
   function renderBotResponse(payload) {
-    if (payload.fulfillment_response?.messages) {
-      payload.fulfillment_response.messages.forEach(msg => {
-        if (msg.text?.text?.length) {
-          const botMsg = document.createElement("div");
-          botMsg.className = "message bot";
-          const span = document.createElement("span");
-          span.innerHTML = autoLinkify(msg.text.text[0]);
-          botMsg.appendChild(span);
-          chatMessages.appendChild(botMsg);
-        }
-      });
-    }
+    payload.fulfillment_response?.messages?.forEach(msg => {
+      if (msg.text?.text?.[0]) {
+        const botMsg = document.createElement("div");
+        botMsg.className = "message bot";
+        const span = document.createElement("span");
+        span.innerHTML = autoLinkify(msg.text.text[0]);
+        botMsg.appendChild(span);
+        chatMessages.appendChild(botMsg);
+      }
+    });
     if (payload.map_url) {
       const mapBtn = document.createElement("div");
       mapBtn.className = "message bot";
       const lang = payload.language_code || "el";
       const label = lang.startsWith("en") ? "📌 View route on map" : "📌 Δες τη διαδρομή στον χάρτη";
-      mapBtn.innerHTML = `
-        <a href="${payload.map_url}" target="_blank" rel="noopener noreferrer"
+      mapBtn.innerHTML = \`
+        <a href="\${payload.map_url}" target="_blank" rel="noopener noreferrer"
            style="display:inline-block;margin-top:8px;padding:10px 16px;background:#2547f3;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;">
-          ${label}
-        </a>`;
+          \${label}
+        </a>\`;
       const a = mapBtn.querySelector("a");
-      a.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); window.open(a.href, "_blank", "noopener,noreferrer"); });
+      a.addEventListener("click", e => { e.preventDefault(); window.open(a.href, "_blank", "noopener,noreferrer"); });
       a.setAttribute("role","button"); a.setAttribute("tabindex","0");
-      a.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); window.open(a.href, "_blank", "noopener,noreferrer"); }});
+      a.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); window.open(a.href, "_blank", "noopener,noreferrer"); }});
       chatMessages.appendChild(mapBtn);
     }
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  // 8) Send flow
+  // 9) sendMessage with typing sound & animated bubble
   async function sendMessage() {
-  const txt = userInput.value.trim();
-  if (!txt) return;
-  appendMessage(txt, "user");
-  userInput.value = "";
+    const txt = userInput.value.trim();
+    if (!txt) return;
+    appendMessage(txt, "user");
+    userInput.value = "";
 
-  const t = document.createElement("div");
-  t.className = "message bot";
-  t.innerHTML = `
-    <div class="typing-bubble">
-      Ο Mr Booky γράφει
-      <span class="typing-dots">
-        <span>🟢</span><span>🟡</span><span>🔴</span>
-      </span>
-    </div>
-  `;
-  chatMessages.appendChild(t);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+    const t = document.createElement("div");
+    t.className = "message bot";
+    t.innerHTML = \`
+      <div class="typing-bubble">
+        Ο Mr Booky γράφει
+        <span class="typing-dots">
+          <span>🟡</span><span>🟢</span><span>🔴</span>
+        </span>
+      </div>\`;
+    chatMessages.appendChild(t);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  try {
-    const res = await fetch("https://flask-agent-proxy-160866660933.europe-west1.run.app/api/agent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: txt, session_id })
-    });
-    const data = await res.json();
-    t.remove();
-    appendMessage(data.reply || "Λάθος απάντηση", "bot");
-    renderBotResponse(data);
-  } catch (e) {
-    t.remove();
-    appendMessage("❌ Σφάλμα — δοκίμασε ξανά", "bot");
+    typingSound?.play?.().catch(() => {});
+
+    try {
+      const res = await fetch("https://flask-agent-proxy-160866660933.europe-west1.run.app/api/agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: txt, session_id })
+      });
+      const data = await res.json();
+
+      typingSound?.pause?.(); typingSound.currentTime = 0;
+
+      t.remove();
+      appendMessage(data.reply || "Λάθος απάντηση", "bot");
+      renderBotResponse(data);
+    } catch (e) {
+      typingSound?.pause?.(); typingSound.currentTime = 0;
+
+      t.remove();
+      appendMessage("❌ Σφάλμα — δοκίμασε ξανά", "bot");
+    }
   }
-}
 
-
-
-
-  // 9) Clear
+  // 10) clearChat
   function clearChat() {
     chatMessages.innerHTML = "";
     localStorage.removeItem("chat_session_id");
-    session_id = `sess-${Date.now()}`;
+    session_id = \`sess-\${Date.now()}\`;
     localStorage.setItem("chat_session_id", session_id);
     appendMessage("🧹 Συνομιλία μηδενίστηκε.", "bot");
   }
 
-  // 10) Toggle
+  // 11) toggleChat
   function toggleChat() {
     if (!chatbox.classList.contains("show")) {
       chatbox.classList.add("show");
@@ -324,7 +338,7 @@
     }
   }
 
-  // 11) Listeners
+  // 12) listeners
   document.addEventListener("DOMContentLoaded", () => {
     toggleBtn?.addEventListener("click", () => { toggleChat(); setTimeout(() => toggleBtn.blur(), 1); });
     closeBtn?.addEventListener("click", toggleChat);
@@ -333,12 +347,10 @@
     userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
   });
 
-  // (optional) export
+  // Export in case
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
-
-
 
 
 
