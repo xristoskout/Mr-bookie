@@ -55,6 +55,30 @@
     }
     .toggle-chatbox:hover .chat-tooltip { opacity: 1; transform: translate(-50%, -10px); }
 
+    .orbiting-taxi {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/taxi-icon.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  animation: orbit-taxi 4s linear infinite;
+}
+
+@keyframes orbit-taxi {
+  0% {
+    transform: rotate(0deg) translateX(60px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(60px) rotate(-360deg);
+  }
+}
+
     .chatbox {
       position: fixed; bottom: 6rem; left: 3.5rem;
       width: min(420px, 90vw); height: min(750px, 90svh);
@@ -104,29 +128,30 @@
 
   // 3) HTML
   const html = `
-    <div class="chatbox-wrapper">
-      <button class="toggle-chatbox" tabindex="-1" aria-label="Άνοιγμα συνομιλίας">
-        <span class="chat-tooltip">💬 Chat Now</span>
-      </button>
-      <div class="chatbox" id="chatbox">
-        <div class="chat-header">
-          <div><strong>Mr Booky</strong><br/>
-            <span style="font-size:.65rem;font-weight:normal;">Powered by Taxi Express Patras</span>
-          </div>
-          <div style="display:flex;gap:.5rem;align-items:center;margin-left:auto;">
-            <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor:pointer;">close</span>
-            <span class="material-icons clear-chat" title="Καθαρισμός" style="cursor:pointer;">delete_sweep</span>
-          </div>
+  <div class="chatbox-wrapper">
+    <button class="toggle-chatbox" tabindex="-1" aria-label="Άνοιγμα συνομιλίας">
+      <span class="chat-tooltip">💬 Chat Now</span>
+      <span class="orbiting-taxi"></span>
+    </button>
+    <div class="chatbox" id="chatbox">
+      <div class="chat-header">
+        <div><strong>Mr Booky</strong><br/>
+          <span style="font-size:.65rem;font-weight:normal;">Powered by Taxi Express Patras</span>
         </div>
-        <div class="chat-messages" id="chat-messages"></div>
-        <div class="input-area">
-          <input type="text" id="user-input" placeholder="Πληκτρολογήστε…"/>
-          <button id="send-btn" title="Αποστολή"><span class="material-icons">send</span></button>
+        <div style="display:flex;gap:.5rem;align-items:center;margin-left:auto;">
+          <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor:pointer;">close</span>
+          <span class="material-icons clear-chat" title="Καθαρισμός" style="cursor:pointer;">delete_sweep</span>
         </div>
       </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="input-area">
+        <input type="text" id="user-input" placeholder="Πληκτρολογήστε…"/>
+        <button id="send-btn" title="Αποστολή"><span class="material-icons">send</span></button>
+      </div>
     </div>
-    <audio id="botSound" src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/wet-431.mp3" preload="auto"></audio>
-  `;
+  </div>
+  <audio id="botSound" src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/wet-431.mp3" preload="auto"></audio>
+`;
   document.body.insertAdjacentHTML("beforeend", html);
 
   // 4) DOM refs
@@ -360,6 +385,7 @@ t.innerHTML = `
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
