@@ -1,5 +1,6 @@
 (() => {
   // 1) Material Icons
+  console.log("✅ Mr Booky widget loaded");
   const link = document.createElement("link");
   link.rel = "stylesheet";
   link.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
@@ -325,7 +326,7 @@
     const header = document.querySelector(".chat-header");
     if (header) {
       clearInterval(intervalCheck);
-      header.innerHTML = \`
+      header.innerHTML = `
         <div class="header-text">
           <div class="booky-title">Mr Booky</div>
           <div class="booky-subtitle">Powered by Taxi Express Patras</div>
@@ -335,7 +336,7 @@
           <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor:pointer;">power_settings_new</span>
           <span class="material-icons clear-chat" title="Καθαρισμός" style="cursor:pointer;">auto_delete</span>
         </div>
-      \`;
+      `;
     }
   }, 300);
 
@@ -566,9 +567,6 @@ t.innerHTML = `
   }
 }
 
-
-
-
   // 9) Clear
   function clearChat() {
     chatMessages.innerHTML = "";
@@ -606,6 +604,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
