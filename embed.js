@@ -131,7 +131,7 @@
     }
 
     .chat-header {
-      background: radial-gradient(ellipse at center, #8c1321 0%, #5e0610 100%);
+      background: radial-gradient(ellipse at center, #f8fb11 10%, #ba091e 90%);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
       display: flex;
@@ -166,7 +166,7 @@
     }
     .booky-title {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.5rem;
+      font-size: 2rem;
       font-weight: 900;
       letter-spacing: 1px;
       margin: 0;
@@ -176,7 +176,7 @@
       animation: flicker 3s infinite ease-in-out;
     }
     .booky-subtitle {
-      font-size: 0.7rem;
+      font-size: 0.85rem;
       color: #cbd5e1;
       margin: 0;
       text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
@@ -596,6 +596,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
