@@ -351,19 +351,21 @@
   }, 7000);
 
   // 3) HTML
-  const html = `
+const html = `
   <div class="chatbox-wrapper">
     <button class="toggle-chatbox" tabindex="-1" aria-label="Άνοιγμα συνομιλίας">
       <span class="chat-tooltip">💬 Chat Now</span>
     </button>
     <div class="chatbox" id="chatbox">
       <div class="chat-header">
-        <div><strong>Mr Booky</strong><br/>
-          <span style="font-size:.65rem;font-weight:normal;">Powered by Taxi Express Patras</span>
+        <div class="header-text">
+          <div class="booky-title">Mr Booky</div>
+          <div class="booky-subtitle">Powered by Taxi Express Patras</div>
         </div>
-        <div style="display:flex;gap:.5rem;align-items:center;margin-left:auto;">
-          <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor:pointer;">close</span>
-          <span class="material-icons clear-chat" title="Καθαρισμός" style="cursor:pointer;">delete_sweep</span>
+        <div class="booky-avatar"></div>
+        <div class="header-actions">
+          <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor:pointer;">power_settings_new</span>
+          <span class="material-icons clear-chat" title="Καθαρισμός" style="cursor:pointer;">auto_delete</span>
         </div>
       </div>
       <div class="chat-messages" id="chat-messages"></div>
@@ -375,17 +377,18 @@
   </div>
   <audio id="botSound" src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/wet-431.mp3" preload="auto"></audio>
 `;
-  document.body.insertAdjacentHTML("beforeend", html);
-  const closeBtn = document.querySelector(".close-chat-btn");
-  const clearBtn = document.querySelector(".clear-chat");
 
-  // 4) DOM refs
-  const chatbox = document.getElementById("chatbox");
-  const chatMessages = document.getElementById("chat-messages");
-  const userInput = document.getElementById("user-input");
-  const botSound = document.getElementById("botSound");
-  const toggleBtn = document.querySelector(".toggle-chatbox");
-  const sendBtn = document.getElementById("send-btn");
+document.body.insertAdjacentHTML("beforeend", html);
+
+// 4) DOM refs (πρέπει να γίνουν μετά την εισαγωγή του HTML!)
+const chatbox = document.getElementById("chatbox");
+const chatMessages = document.getElementById("chat-messages");
+const userInput = document.getElementById("user-input");
+const botSound = document.getElementById("botSound");
+const toggleBtn = document.querySelector(".toggle-chatbox");
+const sendBtn = document.getElementById("send-btn");
+const closeBtn = document.querySelector(".close-chat-btn");
+const clearBtn = document.querySelector(".clear-chat");
 
   // 5) Session
   let chatOpened = false;
@@ -605,6 +608,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
