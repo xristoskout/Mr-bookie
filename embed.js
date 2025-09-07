@@ -594,18 +594,19 @@ t.innerHTML = `
   }
 
   // 11) Listeners
-  document.addEventListener("DOMContentLoaded", () => {
-    toggleBtn?.addEventListener("click", () => { toggleChat(); setTimeout(() => toggleBtn.blur(), 1); });
-    closeBtn?.addEventListener("click", toggleChat);
-    clearBtn?.addEventListener("click", clearChat);
-    sendBtn?.addEventListener("click", sendMessage);
-    userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
-  });
+  // Αφού τα στοιχεία έχουν ήδη προστεθεί στη DOM, βάλε τους listeners κατευθείαν:
+toggleBtn?.addEventListener("click", () => { toggleChat(); setTimeout(() => toggleBtn.blur(), 1); });
+closeBtn?.addEventListener("click", toggleChat);
+clearBtn?.addEventListener("click", clearChat);
+sendBtn?.addEventListener("click", sendMessage);
+userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
+
 
   // (optional) export
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
