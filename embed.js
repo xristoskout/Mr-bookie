@@ -100,6 +100,12 @@
       transform: translate(-50%, -10px);
     }
 
+    .chatbox .material-icons.close-chat-btn,
+    .chatbox .material-icons.clear-chat {
+     color: #fbbf24; 
+    }
+ 
+
     .chatbox {
       position: fixed;
       bottom: 6rem;
@@ -322,23 +328,18 @@
   `;
   document.head.appendChild(style);
 
-  const intervalCheck = setInterval(() => {
-    const header = document.querySelector(".chat-header");
-    if (header) {
-      clearInterval(intervalCheck);
-      header.innerHTML = `
-        <div class="header-text">
-          <div class="booky-title">Mr Booky</div>
-          <div class="booky-subtitle">Powered by Taxi Express Patras</div>
-        </div>
-        <div class="booky-avatar"></div>
-        <div class="header-actions">
-          <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor:pointer;">power_settings_new</span>
-          <span class="material-icons clear-chat" title="Καθαρισμός" style="cursor:pointer;">auto_delete</span>
-        </div>
-      `;
-    }
-  }, 300);
+  <div class="header-text">
+    <div class="booky-title">Mr Booky</div>
+    <div class="booky-subtitle">Powered by Taxi Express Patras</div>
+  </div>
+  <div class="booky-avatar"></div>
+  <div class="header-actions">
+    <span class="material-icons close-chat-btn" title="Κλείσιμο" style="cursor:pointer;">power_settings_new</span>
+    <span class="material-icons clear-chat" title="Καθαρισμός" style="cursor:pointer;">auto_delete</span>
+  </div>
+</div>
+
+
 
   // 4) Auto glitch loop
   setInterval(() => {
@@ -375,6 +376,8 @@
   <audio id="botSound" src="https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/wet-431.mp3" preload="auto"></audio>
 `;
   document.body.insertAdjacentHTML("beforeend", html);
+  const closeBtn = document.querySelector(".close-chat-btn");
+  const clearBtn = document.querySelector(".clear-chat");
 
   // 4) DOM refs
   const chatbox = document.getElementById("chatbox");
@@ -382,8 +385,6 @@
   const userInput = document.getElementById("user-input");
   const botSound = document.getElementById("botSound");
   const toggleBtn = document.querySelector(".toggle-chatbox");
-  const closeBtn = document.querySelector(".close-chat-btn");
-  const clearBtn = document.querySelector(".clear-chat");
   const sendBtn = document.getElementById("send-btn");
 
   // 5) Session
@@ -604,6 +605,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
