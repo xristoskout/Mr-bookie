@@ -271,10 +271,10 @@
   const t = document.createElement("div");
   t.className = "message bot";
   t.innerHTML = `
+    <span>Ο Mr Booky γράφει</span>
     <div class="typing-indicator">
-      <span>🐾</span><span>✨</span><span>🌟</span>
+      <span>🟡</span><span>🔵</span><span>🔴</span>
     </div>
-    <span style="margin-left: 10px;">🧙‍♂️ Ο Mr Booky γράφει...</span>
   `;
   chatMessages.appendChild(t);
   chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -294,6 +294,7 @@
     appendMessage("❌ Σφάλμα — δοκίμασε ξανά", "bot");
   }
 }
+
 
 
   // 9) Clear
@@ -333,6 +334,7 @@
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
