@@ -1,4 +1,3 @@
-<script>
 (() => {
   // 🔠 Material Icons
   const link = document.createElement("link");
@@ -423,6 +422,7 @@
     if (e.key === "Enter") sendMessage();
   });
 })();
-</script>
+
+
 
 
