@@ -6,7 +6,7 @@
   link.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
   document.head.appendChild(link);
 
-  // 2) CSS (με hard reset για κάθετο κείμενο)
+  // 2) CSS
   const style = document.createElement("style");
   style.textContent = `
     *, *::before, *::after { box-sizing: border-box; }
@@ -24,9 +24,7 @@
       letter-spacing: normal !important;
     }
 
-    .chatbox-wrapper {
-      position: fixed; bottom: 1.5rem; left: 1.1rem; z-index: 10000;
-    }
+    .chatbox-wrapper { position: fixed; bottom: 1.5rem; left: 1.1rem; z-index: 10000; }
     .toggle-chatbox {
       background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/main/mrbooky.png');
       background-size: cover; background-position: center;
@@ -74,16 +72,11 @@
       padding: 1.25rem; display: flex; align-items: center; justify-content: space-between;
       font-weight: bold; font-size: 1.25rem; color: #1f2937;
     }
-    .chat-messages {
-      flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: .75rem;
-    }
+    .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: .75rem; }
     .message { display: flex; align-items: flex-start; gap: .5rem; max-width: 85%; }
     .message.bot { flex-direction: row; align-self: flex-start; }
     .message.user { flex-direction: row-reverse; align-self: flex-end; }
-    .message span {
-      display: inline-block; padding: .75rem 1rem; border-radius: 1rem;
-      font-size: .95rem; line-height: 1.4; max-width: 100%;
-    }
+    .message span { display: inline-block; padding: .75rem 1rem; border-radius: 1rem; font-size: .95rem; line-height: 1.4; max-width: 100%; }
     .message.bot span { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #1f2937; border: 1px solid #fbbf24; }
     .message.user span { background: linear-gradient(135deg, #fb923c, #f59e0b); color: #fff; }
     .message.bot span a { color: #2563eb; text-decoration: underline; word-break: break-word; }
@@ -92,9 +85,7 @@
       padding: 1rem; background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
       border-top: 1px solid #fbbf24; display: flex; gap: .75rem;
     }
-    .input-area input {
-      flex: 1; padding: .75rem 1rem; border: 1px solid #d1d5db; border-radius: 1rem; outline: none; color: #1f2937;
-    }
+    .input-area input { flex: 1; padding: .75rem 1rem; border: 1px solid #d1d5db; border-radius: 1rem; outline: none; color: #1f2937; }
     .input-area button {
       width: 3rem; height: 3rem; background: linear-gradient(135deg, #fb923c, #f59e0b);
       border: none; border-radius: 1rem; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
@@ -153,26 +144,55 @@
   let session_id = localStorage.getItem("chat_session_id") || `sess-${Date.now()}`;
   localStorage.setItem("chat_session_id", session_id);
 
-  // 6) Markdown + autolink + sanitize (ΧΩΡΙΣ QR)
+  // 6) Markdown-to-plainText-with-URL (χωρίς αγκύλες)
   const mdLinksToHtml = (s) =>
-    (s || "").replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, txt, url) => {
-      const safeUrl = String(url).replace(/"/g, "&quot;");
+    (s || "").replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, txt, rawUrl) => {
+      // καθάρισε "🔗 " αν υπάρχει μέσα στην παρενθέση
+      let cleanUrl = String(rawUrl).replace(/^🔗\s*/i, "").trim();
+      if (/^www\./i.test(cleanUrl)) cleanUrl = "https://" + cleanUrl;
       const safeTxt = String(txt).replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeTxt}</a>`;
+      const safeUrl = cleanUrl.replace(/"/g, "&quot;");
+      // Παράγουμε: κείμενο (🔗 url) όπου το url είναι clickable
+      return `${safeTxt} (<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">🔗 ${safeUrl}</a>)`;
     });
 
-  function autoLinkify(text) {
-    const safeText = String(text).replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const re = /((https?:\/\/[^\s<>()]+)|(tel:\+?\d+)|(mailto:([^\s<>()]+))|(www\.[^\s<>()]+)|([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}))/ig;
-    const linked = safeText.replace(re, m => {
-      let clean = m.replace(/[.,?!;]+$/, "");
-      let url = clean, icon = "🔗";
-      if (/^www\./i.test(clean)) { url = "https://" + clean; icon = "🌐"; }
-      if (/^tel:/.test(clean)) { icon = "📞"; }
-      if (/^mailto:/.test(clean) || /@/.test(clean)) { icon = "📧"; url = /^mailto:/.test(clean) ? clean : "mailto:" + clean; }
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:underline;">${icon} ${clean}</a>`;
+  // 6b) Auto-linker για γυμνά urls/emails/τηλέφωνα (προστασία υπαρχόντων <a>)
+  function autoLinkify(input) {
+    // 1) Μετατροπή markdown πρώτα
+    let text = mdLinksToHtml(String(input));
+
+    // 2) Προστάτεψε ήδη-δημιουργημένα anchors
+    const anchors = [];
+    text = text.replace(/<a\b[^>]*>.*?<\/a>/gis, (m) => {
+      anchors.push(m);
+      return `__A${anchors.length - 1}__`;
     });
-    return mdLinksToHtml(linked);
+
+    // 3) Linkify τα υπόλοιπα καθαρά κείμενα
+    //   - URLs, www., emails, tel:
+    text = text
+      .replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/((https?:\/\/[^\s<>()]+))/ig, (m) =>
+        `<a href="${m}" target="_blank" rel="noopener noreferrer">🔗 ${m}</a>`)
+      .replace(/\b(www\.[^\s<>()]+)\b/ig, (m) => {
+        const url = "https://" + m;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">🌐 ${m}</a>`;
+      })
+      .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/ig, (m) =>
+        `<a href="mailto:${m}" target="_blank" rel="noopener noreferrer">📧 ${m}</a>`)
+      .replace(/\btel:\+?\d+\b/ig, (m) =>
+        `<a href="${m}" target="_blank" rel="noopener noreferrer">📞 ${m.replace(/^tel:/i,"")}</a>`)
+      // Ελληνικοί αριθμοί τηλεφώνου: 10ψήφιος, δέχεται κενά/παύλες (π.χ. 2610 450000)
+      .replace(/\b(2\d{3})[ -]?(\d{6})\b/g, (m, p1, p2) => {
+        const digits = `${p1}${p2}`;
+        const e164 = `+30${digits}`;
+        return `<a href="tel:${e164}" target="_blank" rel="noopener noreferrer">📞 ${p1} ${p2}</a>`;
+      });
+
+    // 4) Επαναφορά anchors
+    text = text.replace(/__A(\d+)__/g, (_, i) => anchors[Number(i)]);
+
+    return text;
   }
 
   // 7) Rendering
@@ -181,7 +201,6 @@
     m.className = "message " + sender;
     const bubble = document.createElement("span");
 
-    // bot: rich; user: plain
     if (sender === "bot") {
       bubble.innerHTML = autoLinkify(content);
     } else {
@@ -192,15 +211,21 @@
     chatMessages.appendChild(m);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
+    // CTA για κλήση – αναγνώριση και με κενά/emoji
     if (sender === "bot") {
-      botSound?.play?.().catch(() => {});
-      // CTA για κλήση αν βλέπουμε τη λέξη ή τον αριθμό
-      if (/(τηλέφων|call|κλήση)/i.test(content) || /2610450000/.test(content)) {
+      const hasCallWord = /(τηλέφων|call|κλήση)/i.test(content);
+      const hasNumber = /(2610[\s-]?45\s?0000|2610450000)/.test(content);
+      if (hasCallWord || hasNumber) {
         const btn = document.createElement("div");
         btn.className = "message bot";
-        btn.innerHTML = `<a href="tel:2610450000" style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">📞 Κλήση 2610450000</a>`;
+        btn.innerHTML = `
+          <a href="tel:+302610450000"
+             style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">
+            📞 Κλήση 2610450000
+          </a>`;
         chatMessages.appendChild(btn);
       }
+      botSound?.play?.().catch(() => {});
     }
   }
 
@@ -302,6 +327,7 @@
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
