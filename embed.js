@@ -108,10 +108,10 @@
 
     .chatbox {
       position: fixed;
-      bottom: 6rem;
+      bottom: 4rem;
       left: 3.5rem;
       width: min(420px, 90vw);
-      height: min(750px, 90svh);
+      height: min(850px, 90svh);
       max-width: calc(100vw - 3rem);
       max-height: calc(100vh - 7.5rem);
       border-radius: 1.5rem;
@@ -596,6 +596,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
