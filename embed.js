@@ -469,25 +469,38 @@ const clearBtn = document.querySelector(".clear-chat");
   }
 
   function renderBotResponse(payload) {
+    const mapUrl = payload.map_url;
+    const suppressInlineMap = !!mapUrl;
     if (payload.fulfillment_response?.messages) {
       payload.fulfillment_response.messages.forEach(msg => {
         if (msg.text?.text?.length) {
-          const botMsg = document.createElement("div");
-          botMsg.className = "message bot";
-          const span = document.createElement("span");
-          span.innerHTML = autoLinkify(msg.text.text[0]);
-          botMsg.appendChild(span);
-          chatMessages.appendChild(botMsg);
+        let text = msg.text.text[0] || "";
+        if (suppressInlineMap) {
+          // βγάλε markdown links τύπου [📌 ...](url)
+          text = text.replace(/\[📌.*?\]\([^)]*\)/g, "");
+          // βγάλε προτάσεις που λένε "δες τη διαδρομή στον χάρτη" / "view route on map"
+          text = text
+            .replace(/(?:μπορείς|μπορεις).*?(?:χάρτη|χαρτη)/gi, "")
+            .replace(/view .*? on map/gi, "");
+          text = text.replace(/^\s+|\s+$/g, "");
+          if (!text) return; // μην φτιάξεις κενή φούσκα
+        }
+        const botMsg = document.createElement("div");
+        botMsg.className = "message bot";
+        const span = document.createElement("span");
+        span.innerHTML = autoLinkify(text);
+        botMsg.appendChild(span);
+        chatMessages.appendChild(botMsg);
         }
       });
     }
-    if (payload.map_url) {
+    if (mapUrl) {
       const mapBtn = document.createElement("div");
       mapBtn.className = "message bot";
       const lang = payload.language_code || "el";
       const label = lang.startsWith("en") ? "📌 View route on map" : "📌 Δες τη διαδρομή στον χάρτη";
       mapBtn.innerHTML = `
-        <a href="${payload.map_url}" target="_blank" rel="noopener noreferrer"
+        <a href="${mapUrl}" target="_blank" rel="noopener noreferrer"
            style="display:inline-block;margin-top:8px;padding:10px 16px;background:#2547f3;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;">
           ${label}
         </a>`;
@@ -596,6 +609,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
