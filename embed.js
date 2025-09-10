@@ -510,6 +510,22 @@ const clearBtn = document.querySelector(".clear-chat");
       a.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); window.open(a.href, "_blank", "noopener,noreferrer"); }});
       chatMessages.appendChild(mapBtn);
     }
+    // 🆕 Booking CTA (universal link) — εμφανίζεται όταν υπάρχει payload.cta_url
+    if (payload.cta_url) {
+      const cta = document.createElement("div");
+      cta.className = "message bot";
+      const label = "🧾 Booking Taxi Now";
+      cta.innerHTML = `
+        <a href="${payload.cta_url}" target="_blank" rel="noopener noreferrer"
+           style="display:inline-block;margin:8px 0 0 0;padding:10px 16px;background:#10b981;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;box-shadow:0 2px 8px rgba(16,185,129,.35);">
+          ${label}
+        </a>`;
+      const a2 = cta.querySelector("a");
+      a2.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); window.open(a2.href, "_blank", "noopener,noreferrer"); });
+      a2.setAttribute("role","button"); a2.setAttribute("tabindex","0");
+      a2.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); window.open(a2.href, "_blank", "noopener,noreferrer"); }});
+      chatMessages.appendChild(cta);
+    }
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
@@ -609,6 +625,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
