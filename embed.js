@@ -433,7 +433,12 @@ const clearBtn = document.querySelector(".clear-chat");
 
     return text;
   }
-
+  
+  // ⛏️ Helper: escape regex specials
+  const escapeRegExp = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // 🔗 Universal booking URL (used to strip inline links & render CTA button)
+  const UNIVERSAL_BOOKING = "https://qr.infoxoros.com/two_buttons_patra_express.php";
+  
   // 7) Rendering
   function appendMessage(content, sender) {
     const m = document.createElement("div");
@@ -441,7 +446,13 @@ const clearBtn = document.querySelector(".clear-chat");
     const bubble = document.createElement("span");
 
     if (sender === "bot") {
-      bubble.innerHTML = autoLinkify(content);
+      // 🧼 Βγάλε από το κείμενο το universal booking link (θα μπει ξεχωριστό κουμπί)
+      let text = String(content || "");
+      const mdRe = new RegExp(`\\[[^\\]]*\\]\\(${escapeRegExp(UNIVERSAL_BOOKING)}\\)`, "gi");
+      text = text.replace(mdRe, "");
+      const rawRe = new RegExp(escapeRegExp(UNIVERSAL_BOOKING), "gi");
+      text = text.replace(rawRe, "");
+      bubble.innerHTML = autoLinkify(text.trim());
     } else {
       bubble.textContent = content;
     }
@@ -468,9 +479,11 @@ const clearBtn = document.querySelector(".clear-chat");
     }
   }
 
-  function renderBotResponse(payload) {
+    function renderBotResponse(payload) {
     const mapUrl = payload.map_url;
+    const ctaUrl = payload.cta_url;
     const suppressInlineMap = !!mapUrl;
+    const suppressInlineCta = !!ctaUrl;
     if (payload.fulfillment_response?.messages) {
       payload.fulfillment_response.messages.forEach(msg => {
         if (msg.text?.text?.length) {
@@ -485,6 +498,15 @@ const clearBtn = document.querySelector(".clear-chat");
           text = text.replace(/^\s+|\s+$/g, "");
           if (!text) return; // μην φτιάξεις κενή φούσκα
         }
+        if (suppressInlineCta) {
+          // Αφαίρεσε από το κείμενο το ίδιο το booking link (θα το δείξουμε ως κουμπί)
+          const cleanedMd = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, label, url) => {
+            return String(url).trim() === String(ctaUrl).trim() ? "" : m;
+          });
+          const reCta = new RegExp(escapeRegExp(ctaUrl), "gi");
+          text = cleanedMd.replace(reCta, "").trim();
+          if (!text) return;
+        }  
         const botMsg = document.createElement("div");
         botMsg.className = "message bot";
         const span = document.createElement("span");
@@ -511,13 +533,13 @@ const clearBtn = document.querySelector(".clear-chat");
       chatMessages.appendChild(mapBtn);
     }
     // 🆕 Booking CTA (universal link) — εμφανίζεται όταν υπάρχει payload.cta_url
-    if (payload.cta_url) {
+    if (ctaUrl) {
       const cta = document.createElement("div");
       cta.className = "message bot";
       const label = "🧾 Booking Taxi Now";
       cta.innerHTML = `
-        <a href="${payload.cta_url}" target="_blank" rel="noopener noreferrer"
-           style="display:inline-block;margin:8px 0 0 0;padding:10px 16px;background:#10b981;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;box-shadow:0 2px 8px rgba(16,185,129,.35);">
+        <a href="${ctaUrl}" target="_blank" rel="noopener noreferrer"
+           style="display:inline-block;margin-top:8px;padding:10px 16px;background:#7c3aed;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;">
           ${label}
         </a>`;
       const a2 = cta.querySelector("a");
@@ -625,6 +647,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
