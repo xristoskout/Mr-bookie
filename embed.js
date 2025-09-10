@@ -118,7 +118,7 @@
       overflow: hidden;
       display: none;
       background: #fff;
-      background-image: url('https://raw.githubusercontent.com/xristoskout/gpt_mr_booky/2485e177c6f65b2ec8c43bd672fd82ec310b7112/docs/20250828_1833_Mr_Booky_remix_01k3rmv7ggf6cstnynmsxx21rp.png');
+      background-image: url('https://raw.githubusercontent.com/xristoskout/Mr-bookie/1e35b35219d6bf738d5d8db407fdddf143b213c1/20250828_1833_Mr_Booky_remix_01k3rmv7ggf6cstnynmsxx21rp.png');
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center center;
@@ -596,6 +596,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
