@@ -470,7 +470,7 @@ const clearBtn = document.querySelector(".clear-chat");
         btn.className = "message bot";
         btn.innerHTML = `
           <a href="tel:+302610450000"
-             style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f59e0b;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">
+             style="display:inline-block;margin-top:8px;padding:10px 16px;background:#f5a500;color:white;border-radius:8px;font-weight:bold;text-decoration:none;">
             📞 Κλήση 2610450000
           </a>`;
         chatMessages.appendChild(btn);
@@ -539,7 +539,7 @@ const clearBtn = document.querySelector(".clear-chat");
       const label = "🧾 Booking Taxi Now";
       cta.innerHTML = `
         <a href="${ctaUrl}" target="_blank" rel="noopener noreferrer"
-           style="display:inline-block;margin-top:8px;padding:10px 16px;background:#d00e52;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;">
+           style="display:inline-block;margin-top:8px;padding:10px 16px;background:#df00ff;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;">
           ${label}
         </a>`;
       const a2 = cta.querySelector("a");
@@ -647,6 +647,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
