@@ -523,7 +523,7 @@ const clearBtn = document.querySelector(".clear-chat");
       const label = lang.startsWith("en") ? "📌 View route on map" : "📌 Δες τη διαδρομή στον χάρτη";
       mapBtn.innerHTML = `
         <a href="${mapUrl}" target="_blank" rel="noopener noreferrer"
-           style="display:inline-block;margin-top:8px;padding:10px 16px;background:#2547f3;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;">
+           style="display:inline-block;margin-top:8px;padding:10px 16px;background:#2547f3;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;min-width: 240px; text-align:center;">
           ${label}
         </a>`;
       const a = mapBtn.querySelector("a");
@@ -538,8 +538,8 @@ const clearBtn = document.querySelector(".clear-chat");
       cta.className = "message bot";
       const label = "🧾 Booking Taxi Now";
       cta.innerHTML = `
-        <a href="${ctaUrl}" target="_blank" rel="noopener noreferrer"
-           style="display:inline-block;margin-top:8px;padding:10px 16px;background:#df00ff;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;">
+        +        <a href="${payload.cta_url}" target="_blank" rel="noopener noreferrer"
++           style="display:inline-block;margin:8px 0 0 0;padding:10px 16px;background:#df00ff;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;box-shadow:0 2px 8px rgba(124,58,237,.35);min-width: 240px; text-align:center;">
           ${label}
         </a>`;
       const a2 = cta.querySelector("a");
