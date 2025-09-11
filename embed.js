@@ -538,8 +538,8 @@ const clearBtn = document.querySelector(".clear-chat");
       cta.className = "message bot";
       const label = "🧾 Booking Taxi Now";
       cta.innerHTML = `
-        +        <a href="${payload.cta_url}" target="_blank" rel="noopener noreferrer"
-+           style="display:inline-block;margin:8px 0 0 0;padding:10px 16px;background:#df00ff;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;box-shadow:0 2px 8px rgba(124,58,237,.35);min-width: 240px; text-align:center;">
+        <a href="${payload.cta_url}" target="_blank" rel="noopener noreferrer"
+        style="display:inline-block;margin:8px 0 0 0;padding:10px 16px;background:#df00ff;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;box-shadow:0 2px 8px rgba(124,58,237,.35);min-width: 240px; text-align:center;">
           ${label}
         </a>`;
       const a2 = cta.querySelector("a");
@@ -647,6 +647,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
