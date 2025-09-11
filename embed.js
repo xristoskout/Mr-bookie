@@ -108,10 +108,10 @@
 
     .chatbox {
       position: fixed;
-      bottom: 3rem;
+      bottom: 2.5rem;
       left: 3.5rem;
       width: min(450px, 90vw);
-      height: min(900px, 90svh);
+      height: min(960px, 90svh);
       max-width: calc(100vw - 3rem);
       max-height: calc(100vh - 7.5rem);
       border-radius: 1.5rem;
@@ -539,7 +539,7 @@ const clearBtn = document.querySelector(".clear-chat");
       const label = "🧾 Booking Taxi Now";
       cta.innerHTML = `
         <a href="${ctaUrl}" target="_blank" rel="noopener noreferrer"
-           style="display:inline-block;margin-top:8px;padding:10px 16px;background:#7c3aed;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;">
+           style="display:inline-block;margin-top:8px;padding:10px 16px;background:#d00e52;color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:all .3s;">
           ${label}
         </a>`;
       const a2 = cta.querySelector("a");
@@ -647,6 +647,7 @@ userInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage
   window.sendMessage = sendMessage;
   window.clearChat = clearChat;
 })();
+
 
 
 
